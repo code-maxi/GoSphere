@@ -1,8 +1,7 @@
 package math;
-import client.GoVector;
 
 public class GoMatrix {
-    final double[][] com;
+    public final double[][] com;
     public GoMatrix(double[][] com) {
         this.com = com;
     }
@@ -48,5 +47,54 @@ public class GoMatrix {
             res += "|\n";
         }
         return res;
+    }
+
+    public static GoMatrix scale(double x, double y, double z) {
+        return new GoMatrix(new double[][] {
+            { x, 0, 0, 0 },
+            { 0, y, 0, 0 },
+            { 0, 0, z, 0 },
+            { 0, 0, 0, 1 }
+        });
+    }
+
+    public static GoMatrix rotateX(double a) {
+        return new GoMatrix(new double[][] {
+            { 1,           0,            0, 0 },
+            { 0, Math.cos(a), -Math.sin(a), 0 },
+            { 0, Math.sin(a),  Math.cos(a), 0 },
+            { 0,            0,           0, 1 }
+        });
+    }
+
+    public static GoMatrix rotateY(double a) {
+        return new GoMatrix(new double[][] {
+            { Math.cos(a), 0, Math.sin(a), 0 },
+            { 0,           1,           0, 0 },
+            {-Math.sin(a), 0, Math.cos(a), 0 },
+            { 0,           0,           0, 1 }
+        });
+    }
+
+    public static GoMatrix rotateZ(double a) {
+        return new GoMatrix(new double[][] {
+            { Math.cos(a), -Math.sin(a), 0, 0 },
+            { Math.sin(a),  Math.cos(a), 0, 0 },
+            { 0,            0,           1, 0 },
+            { 0,            0,           0, 1 }
+        });
+    }
+
+    public static GoMatrix rotate(double[] rot) {
+        return GoMatrix.rotateZ(rot[2]).mul(GoMatrix.rotateY(rot[1]).mul(GoMatrix.rotateX(rot[0])));
+    }
+
+    public static GoMatrix translate(GoVector d) {
+        return new GoMatrix(new double[][] {
+            { 1, 0, 0, d.com[0] },
+            { 0, 1, 0, d.com[1] },
+            { 0, 0, 1, d.com[2] },
+            { 0, 0, 0, 1 }
+        });
     }
 }

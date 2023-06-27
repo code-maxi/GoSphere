@@ -7,7 +7,9 @@ import data.*;
 
 public class GoClient {
     public static void main(String[] args) {
-        GoPos pos = new GoPos(0, 6, 8);
-        System.out.println(pos);
+        GoState state = new GoState(8, "2345", true);
+        System.out.println("State____\n" + state);
+        GoViewer viewer = new GoViewer(state);
+        viewer.init();
     }
 }
