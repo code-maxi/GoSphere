@@ -1,39 +1,57 @@
 package client;
 import data.*;
+import java.awt.*;
 import java.awt.geom.*;
-import java.awt.Color;
+
 import math.*;
 
 public class GoCanvasPoint {
     public GoPos pos;
+    public Path2D.Double path;
     public Ellipse2D.Double ellipse;
-    public Ellipse2D.Double ellipse2;
+    public GoVector center;
     
     public GoCanvasPoint(GoPos pos) {
         this.pos = pos;
     }
 
-    public void update(GoMatrix Trm) {
-        GoVector[] pos3d = this.pos.to3D();
+    public void update(GoMatrix Trm, double[][] wlist) {
+        GoVector[] pos3d = this.pos.to3D(wlist);
+        double[][] rendered_pos = new double[pos3d.length][pos3d[0].com.length];
         
-        double[] p0 = Trm.mul(pos3d[0]).com;
-        double[] p1 = Trm.mul(pos3d[1]).com;
-        double[] p2 = Trm.mul(pos3d[2]).com;
-
-        double[] maxmin_x = p1[0] > p2[0] ? new double[]{p1[0], p2[0]} : new double[]{p2[0], p1[0]};
-        double[] maxmin_y = p1[1] > p2[1] ? new double[]{p1[1], p2[1]} : new double[]{p2[1], p1[1]};
-
+        path = new Path2D.Double();
+        for (int i = 0; i < pos3d.length; i ++) {
+            GoVector trans = Trm.mul(pos3d[i]);
+            rendered_pos[i] = trans.com;
+            if (i == 0) center = trans;
+            else {
+                if (i == 1) path.moveTo(rendered_pos[i][0], rendered_pos[i][1]);
+                else        path.lineTo(rendered_pos[i][0], rendered_pos[i][1]);
+            }
+        }
+        path.closePath();
+            
         ellipse = new Ellipse2D.Double(
-            maxmin_x[1], maxmin_y[1],
-            maxmin_x[0] - maxmin_x[1],
-            maxmin_y[0] - maxmin_y[1]
-        );
-        ellipse2 = new Ellipse2D.Double(
-            p0[0] - 5, p0[1] - 5, 10, 10
+            rendered_pos[0][0] - 5, 
+            rendered_pos[0][1] - 5, 
+            10, 10
         );
     }
 
+    public void paint(Graphics2D g2) {
+        Color col = color();
+        if (col != null) {
+            g2.setColor(col);
+            g2.fill(path);
+            if (pos.p == 1) {
+                g2.setStroke(new BasicStroke(2));
+                g2.setColor(Color.GRAY);
+                g2.draw(path);
+            }
+        }
+    }
+
     public Color color() {
-        return pos.p == 1 ? Color.WHITE : (pos.p == 2 ? Color.BLACK : Color.GREEN);
+        return pos.p == 1 ? Color.WHITE : (pos.p == 2 ? new Color(0.1f, 0.1f, 0.1f) : null);
     }
 }

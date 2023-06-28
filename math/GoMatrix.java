@@ -58,6 +58,15 @@ public class GoMatrix {
         });
     }
 
+    public static GoMatrix unit() {
+        return new GoMatrix(new double[][] {
+            { 1, 0, 0, 0 },
+            { 0, 1, 0, 0 },
+            { 0, 0, 1, 0 },
+            { 0, 0, 0, 1 }
+        });
+    }
+
     public static GoMatrix rotateX(double a) {
         return new GoMatrix(new double[][] {
             { 1,           0,            0, 0 },
@@ -85,8 +94,10 @@ public class GoMatrix {
         });
     }
 
-    public static GoMatrix rotate(double[] rot) {
-        return GoMatrix.rotateZ(rot[2]).mul(GoMatrix.rotateY(rot[1]).mul(GoMatrix.rotateX(rot[0])));
+    public static GoMatrix rotate(GoVector rot) {
+        return GoMatrix.rotateZ(rot.com[2])
+            .mul(GoMatrix.rotateY(rot.com[1])
+            .mul(GoMatrix.rotateX(rot.com[0])));
     }
 
     public static GoMatrix translate(GoVector d) {
