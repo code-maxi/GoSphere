@@ -20,11 +20,11 @@ public class GoVector {
 
     public double length() { return Math.sqrt(com[0] * com[0] + com[1] * com[1] + com[2] * com[2]); }
 
-    public static GoVector polar(double w1, double w2) {
+    public static GoVector polar(double[] polar) {
         return new GoVector(
-            Math.sin(w1) * Math.cos(w2),
-            Math.sin(w1) * Math.sin(w2),
-            Math.cos(w1)
+            Math.sin(polar[0]) * Math.cos(polar[1]),
+            Math.sin(polar[0]) * Math.sin(polar[1]),
+            Math.cos(polar[0])
         );
     }
 }

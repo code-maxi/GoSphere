@@ -1,57 +1,40 @@
 package data;
+import java.io.Serializable;
+
 import math.*;
 
-public class GoPos {
-    public static final double STONE_RAD_FAC = 0.3;
-    public static final double STONE_DECREASE_FAC = 0.3;
-    public static final int STONE_RES = 32;
-
+public class GoPos implements Serializable {
     public final int x;
     public final int y;
     public final int n;
-    public final int p;
+    public final int stone; // 0 = nothing, 1 = black, 2 = white
 
-    public GoPos(int x, int y, int n, int p) {
-        this.n = n; this.p = p;
+    private static int[] newXY(int x, int y, int n) {
         int xx = (y == 0 || y == n/2) ? 0 : (x % n);
         int yy = y % n;
         if (yy > n/2) {
             yy = n - yy;
             xx = (n/2 + xx) % n;
         }
-        this.x = xx;
-        this.y = yy;
-        if (this.x >= n) System.out.println(this);
+        return new int[]{xx, yy};
     }
 
-    public GoPos changeP(int pn) {
-        return new GoPos(x, y, n, pn);
+    public GoPos(int x, int y, int n, int s) {
+        this.n = n; this.stone = s;
+        int[] newxy = newXY(x, y, n);
+        this.x = newxy[0]; this.y = newxy[1];
     }
 
-    public GoVector[] to3D(double[][] wlist) { // 1. element = center, 2. = left corner of ellipse, 3. = right corner of ellipse
-        double w1 = wlist[0][y];//2*Math.PI*y / n;
-        double w2 = wlist[1][x];//2*Math.PI*x / n;
-        GoVector center = GoVector.polar(w1, w2);
-
-        double rad = Math.sqrt(center.com[0] * center.com[0] + center.com[1] * center.com[1]);
-        double rad_f = (1 - GoPos.STONE_DECREASE_FAC) + GoPos.STONE_DECREASE_FAC * rad;
-
-        double wa1 = 2*Math.PI/n * GoPos.STONE_RAD_FAC * rad_f;
-        double wa2 = wa1 / rad * rad_f;
-
-        GoVector[] res = new GoVector[GoPos.STONE_RES + 1];
-        res[0] = center;
-
-        for (int i = 0; i < GoPos.STONE_RES; i ++) {
-            double a = (double) i / (double) GoPos.STONE_RES * 2 * Math.PI;
-            res[i + 1] = GoVector.polar(
-                w1 + Math.cos(a) * wa1,
-                w2 + Math.sin(a) * wa2
-            );
-        }
-
-        return res;
+    public GoPos(int x, int y, int[][] stones) {
+        this.n = stones.length;
+        int[] newxy = newXY(x, y, n);
+        this.x = newxy[0]; this.y = newxy[1];
+        this.stone = stones[y][x];
     }
+
+    public GoPos changeStone(int s) { return new GoPos(x, y, n, s); }
+
+    public boolean equals(GoPos that) { return this.x == that.x && this.y == that.y; }
 
     public String toString() {
         return "[" + x + " | " + y + " – n" + n + "]";
