@@ -21,17 +21,18 @@ public class GoClient extends GoSocket {
             String con = ((String) message).substring(3);
             if (sub.equals("ERR")) System.out.println(GoConsole.ANSI_RED + "\nSERVER ERROR: " + con + GoConsole.ANSI_RESET);
             if (sub.equals("INF")) System.out.println(GoConsole.ANSI_BLUE + "\nSERVER INFO: " + con + GoConsole.ANSI_RESET);
+            if (sub.equals("GUI") && viewer != null) viewer.labels.showError(con); 
         }
         if (message instanceof GoState) {
             state = (GoState) message;
-            System.out.println("\nGoState recieved:\n" + state);
             if (viewer == null) viewer = new GoViewer(state, this);
             else viewer.setState(state);
         }
     }
 
     public static void main(String[] args) {
-        GoState state = new GoState(20, 2345);
+        GoState state = new GoState(20, 2345).copy(0);
+        state.turn = 0;
         for (int i = 0; i < state.stones.length; i ++) {
             for (int j = 0; j < state.stones[i].length; j ++) {
                 int stone = (int)(Math.random() > 0.8 ? (Math.random() * 2d + 1) : 0);

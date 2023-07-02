@@ -1,12 +1,17 @@
 package client;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
 import data.*;
 import server.GoServer;
 
-public class GoViewer extends JFrame {
-    private final GoCanvas canvas;
-    private final GoLabels labels;
+public class GoViewer extends JFrame implements KeyListener, WindowListener {
+    public final GoCanvas canvas;
+    public final GoLabels labels;
     final GoClient client;
 
     public GoViewer(GoState state, GoClient client) {
@@ -15,9 +20,13 @@ public class GoViewer extends JFrame {
         this.canvas = new GoCanvas(state, this);
         this.labels = new GoLabels(state);
         setSize(800, 800);
+
         add(canvas, BorderLayout.CENTER);
         add(labels, BorderLayout.NORTH);
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        addKeyListener(this);
+        addWindowListener(this);
         setLocationRelativeTo(null);
         setTitle("GoSphere – Game ["+(GoServer.FORMAT_ID(state.id))+"]");
         setAlwaysOnTop(true);
@@ -27,4 +36,27 @@ public class GoViewer extends JFrame {
         canvas.setState(state);
         labels.setState(state);
     }
+    public void doMove(GoMove move) {
+        if (client != null) client.send(move);
+        System.out.println("Client MOVE: " + move);
+    }
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+        if (key == KeyEvent.VK_P && e.isControlDown()) {
+            doMove(new GoMove(GoMove.PASS, null, canvas.state.me));
+        }
+    }
+    public void keyTyped(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {}
+
+    public void windowClosing​(WindowEvent e) {
+        if (client != null) client.close();
+    }
+
+    public void windowActivated​(WindowEvent e) {}
+    public void windowDeactivated​(WindowEvent e) {}
+    public void windowClosed​(WindowEvent e) {}
+    public void windowDeiconified​(WindowEvent e) {}
+    public void windowIconified​(WindowEvent e) {}
+    public void windowOpened​(WindowEvent e) {}
 }

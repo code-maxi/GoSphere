@@ -7,7 +7,7 @@ import data.*;
 import java.util.ArrayList;
 import math.*;
 
-public class GoCanvas extends JPanel implements ActionListener, MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
+public class GoCanvas extends JPanel implements ActionListener, MouseMotionListener, MouseListener, MouseWheelListener {
     public static final Color[] SPHERE_COLORS = {
         new Color(0.8f, 0.8f, 0.8f, 0.9f),
         new Color(0.4f, 0.4f, 0.4f, 0.96f)
@@ -15,9 +15,9 @@ public class GoCanvas extends JPanel implements ActionListener, MouseMotionListe
     public static final float[] SPHERE_DIST = {0.45f, 1.0f};
     public static final double SCROLL_FAC = 0.05;
     public static final double DRAG_FAC = 0.005;
-    public static final double MAX_MOUSEMOVE = 10;
+    public static final double MAX_MOUSEMOVE = 5;
 
-    private GoState state;
+    public GoState state;
     
     private ArrayList<GoCanvasPoint> points = new ArrayList<GoCanvasPoint>();
     private ArrayList<GoCanvasStroke> strokes = new ArrayList<GoCanvasStroke>();
@@ -46,12 +46,12 @@ public class GoCanvas extends JPanel implements ActionListener, MouseMotionListe
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
-        addKeyListener(this);
         setState(state);
     }
 
     public void setState(GoState state) {
         this.state = state;
+        this.hover_pos = null;
         
         this.wlist = new double[][] {
             new double[state.n/2 + 1],
@@ -155,10 +155,7 @@ public class GoCanvas extends JPanel implements ActionListener, MouseMotionListe
         }
     }
 
-    public void doMove(GoMove move) {
-        if (viewer.client != null) viewer.client.send(move);
-        System.out.println("Client MOVE: " + move);
-    }
+    
 
     @Override
     public void mouseMoved(MouseEvent e) {
@@ -180,18 +177,21 @@ public class GoCanvas extends JPanel implements ActionListener, MouseMotionListe
         drag_pos = new double[2][2];
         drag_pos[0][0] = e.getX();
         drag_pos[0][1] = e.getY();
+        drag_pos[1][0] = e.getX();
+        drag_pos[1][1] = e.getY();
     }
 
     public void mouseReleased(MouseEvent e) {
         Rot_old  = Rot_drag.mul(Rot_old);
         Rot_drag = GoMatrix.unit();
-        GoVector delta = new GoVector(
-            drag_pos[1][0] - drag_pos[0][0],
-            drag_pos[1][1] - drag_pos[0][1],
-            0
-        );
-        if (delta.length() <= MAX_MOUSEMOVE) {
-            doMove(new GoMove(GoMove.POS, hover_pos, state.me));
+        if (hover_pos != null) {
+            GoVector delta = new GoVector(
+                drag_pos[1][0] - drag_pos[0][0],
+                drag_pos[1][1] - drag_pos[0][1],
+                0
+            );
+            if (delta.length() <= MAX_MOUSEMOVE)
+                viewer.doMove(new GoMove(GoMove.POS, hover_pos, state.me));
         }
     }
 
@@ -201,14 +201,4 @@ public class GoCanvas extends JPanel implements ActionListener, MouseMotionListe
         scale_state += e.getWheelRotation() * GoCanvas.SCROLL_FAC * scale_state;
         repaint();
     }
-
-    
-    public void keyPressed(KeyEvent e) {
-        int key = e.getKeyCode();
-        if (key == KeyEvent.VK_P && e.isControlDown()) {
-            doMove(new GoMove(GoMove.PASS, null, state.me));
-        }
-    }
-    public void keyTyped(KeyEvent e) {}
-    public void keyReleased(KeyEvent e) {}
 }

@@ -25,14 +25,14 @@ public class GoState implements Serializable {
     public GoState(int n, int id) {
         this(n, id, new int[n][n], new String[2], -1, -1);
         this.stones[0] = new int[1];
-        this.stones[n/2-1] = new int[1];
+        this.stones[n/2] = new int[1];
     }
 
     public GoState copy(int me) {
         String[] copied_labels = Arrays.copyOf(labels, labels.length);
         int[][] copied_stones = new int[n][n];
         copied_stones[0] = new int[1];
-        copied_stones[n/2-1] = new int[1];
+        copied_stones[n/2] = new int[1];
         for (int i = 0; i < stones.length; i ++) {
             copied_stones[i] = Arrays.copyOf(stones[i], stones[i].length);
         }

@@ -81,7 +81,8 @@ public class GoConsole implements Runnable {
 
                 GoConfig config = new GoConfig(
                     (double) promts.get("komi").value,
-                    (int) promts.get("n").value, 
+                    (int) promts.get("n").value,
+                    (int) args.length > 7 ? Integer.parseInt(args[7]) : -1,
                     (int) promts.get("first_color").value, 0,
                     (String) promts.get("creator_name").value
                 );
@@ -90,7 +91,7 @@ public class GoConsole implements Runnable {
             }
             else {
                 promts.put("name", new GoPromt("name", "JOIN GAME: What's your name?", GoPromt.STR, NAMEPATTERN, args.length > 3 ? args[3] : null));
-                promts.put("id", new GoPromt("id", "JOIN GAME: Enter the id of your game.", GoPromt.INT, null, null));
+                promts.put("id", new GoPromt("id", "JOIN GAME: Enter the id of your game.", GoPromt.INT, null, args.length > 4 ? Integer.parseInt(args[4]) : null));
                 GoPromt.promt(promts, reader, prmtstr);
 
                 GoJoin join = new GoJoin((String) promts.get("name").value, (int) promts.get("id").value);

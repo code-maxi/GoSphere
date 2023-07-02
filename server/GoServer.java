@@ -37,15 +37,18 @@ public class GoServer implements Runnable {
         if (game == null) return "The game with ID [" + FORMAT_ID(join.id) + "] does not exist.";
         else {
             user.name = join.name;
+            user.game = game;
             return game.addUser(user, -1);
         }
     }
 
     public String createNewGame(GoConfig conf, GoUser user) {
-        if (conf.n < 0 || conf.n > 40 || conf.n % 4 != 0) return "The Size must be beween 0 and 40 and it must be divisible by 4.";
+        int id = conf.preferred_id >= 0 ? conf.preferred_id : newID();
+        if (used_ids.contains(id)) return "The preferred ID " + id + " is in use.";
+        else if (conf.n < 0 || conf.n > 40 || conf.n % 4 != 0) return "The Size must be beween 0 and 40 and it must be divisible by 4.";
         else if (conf.first_color > 1) return "The color must be either 0 (black) or 1 (white).";
         else {
-            GoGame game = new GoGame(conf, newID());
+            GoGame game = new GoGame(conf, id);
             user.name = conf.creator_name;
             user.game = game;
             game.addUser(user, conf.first_color);

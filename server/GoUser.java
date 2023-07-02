@@ -36,20 +36,20 @@ public class GoUser extends GoSocket {
                     GoJoin join = (GoJoin) message;
                     String error = server.joinGame(join, this);
                     if (error == null) {
-                        send("INF You successfully joined the game. Have fun!");
+                        send("INFYou successfully joined the game. Have fun!");
                     }
                     else send("ERR " + error);
                 }
             }
-            else send("ERR You are already in a game.");
+            else send("ERRYou are already in a game.");
         }
         if (message instanceof GoMove) {
             if (game != null) {
                 GoMove move = (GoMove) message;
                 String error = game.move(move);
-                if (error != null) send("ERR " + error);
+                if (error != null) send("GUI" + error);
             }
-            else send("ERR You are not in a game yet.");
+            else send("ERRYou are not in a game yet.");
         }
         if (message instanceof String) {
             String str = (String) message;

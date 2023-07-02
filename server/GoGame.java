@@ -25,7 +25,7 @@ public class GoGame {
             players[player] = user;
             if (players[0] != null && players[1] != null) {
                 state.turn = 0;
-                System.out.print("GAME STARTS, \n" + state + "______");
+                System.out.print("GAME STARTS!");
             }
             sendState();
             return null;
@@ -39,8 +39,6 @@ public class GoGame {
         for (int i = 0; i < players.length; i ++) {
             if (players[i] != null) {
                 GoState s = state.copy(i);
-                System.out.println("Player "+i+" ____");
-                System.out.println(s + "\n");
                 players[i].send(s);
             }
         }
@@ -63,8 +61,15 @@ public class GoGame {
     public String move(GoMove move) {
         if (state.turn == -1) return "MOVEERROR: The game has not begun yet!";
         if (move.me != state.turn) return "MOVEERROR: It's not your turn!";
-        if (move.action == GoMove.POS && move.pos != null) {
-            state.stones[move.pos.y][move.pos.x] = state.turn + 1;
+        if (move.action == GoMove.POS) {
+            if (move.pos != null && state.stones.length > move.pos.y && state.stones[move.pos.y].length > move.pos.x) {
+                state.stones[move.pos.y][move.pos.x] = state.turn + 1;
+            }
+            else return "MOVEERROR: The move "+move+" is out of area! " + state.stones.length + " – " + state.stones[move.pos.y].length;
+        }
+        if (move.action == GoMove.PASS) {
+            players_passed[move.me] = true;
+            players_passed[(move.me+1)%2] = false;
         }
         state.turn = (state.turn + 1) % 2;
         sendState();
@@ -76,6 +81,6 @@ public class GoGame {
             players[0] != null ? players[0].name : "-", 
             players[1] != null ? players[1].name : "-"
         };
-        return "Game ["+ GoServer.FORMAT_ID(state.id) + "], players:  '" + names[0] + "' (black) : '" + names[1] + "' (white)";
+        return "Game ["+ GoServer.FORMAT_ID(state.id) + "], players: " + names[0] + " (black) : " + names[1] + " (white)";
     }
 }
