@@ -40,23 +40,41 @@ public class GoViewer extends JFrame implements KeyListener, WindowListener {
         if (client != null) client.send(move);
         System.out.println("Client MOVE: " + move);
     }
+    
+    @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        if (key == KeyEvent.VK_P && e.isControlDown()) {
-            doMove(new GoMove(GoMove.PASS, null, canvas.state.me));
+        if (key == KeyEvent.VK_SPACE) {
+            client.send("NXT" + client.state.me);
         }
     }
+
+    @Override
     public void keyTyped(KeyEvent e) {}
+
+    @Override
     public void keyReleased(KeyEvent e) {}
 
+    @Override
     public void windowClosing​(WindowEvent e) {
         if (client != null) client.close();
     }
 
+    @Override
     public void windowActivated​(WindowEvent e) {}
+
+    @Override
     public void windowDeactivated​(WindowEvent e) {}
+
+    @Override
     public void windowClosed​(WindowEvent e) {}
+
+    @Override
     public void windowDeiconified​(WindowEvent e) {}
+
+    @Override
     public void windowIconified​(WindowEvent e) {}
+
+    @Override
     public void windowOpened​(WindowEvent e) {}
 }

@@ -1,42 +1,47 @@
 package data;
-import java.io.Serializable;
+import java.util.ArrayList;
 
-import math.*;
+public class GoPos extends GoPosAbstract {
+    public static GoPosAbstract goPosOnStones(int x, int y, int[][] stones) {
+        GoPosAbstract pos = new GoPos(x, y, stones[1].length, 0);
+        pos = pos.changeStone(stones[pos.y][pos.x]);
+        return pos;
+    }
 
-public class GoPos implements Serializable {
-    public final int x;
-    public final int y;
-    public final int n;
-    public final int stone; // 0 = nothing, 1 = black, 2 = white
+    public GoPos(int x, int y, int n, int s) {
+        super(x, y, n, s);
+    }
 
-    private static int[] newXY(int x, int y, int n) {
-        int xx = (y == 0 || y == n/2) ? 0 : (x % n);
-        int yy = y % n;
+    @Override
+    public int[] newXY(int x, int y) {
+        int xx = (y == 0 || y == n/2) ? 0 : mod(x, n);
+        int yy = mod(y, n);
         if (yy > n/2) {
             yy = n - yy;
-            xx = (n/2 + xx) % n;
+            xx = mod(n/2 + xx, n);
         }
         return new int[]{xx, yy};
     }
 
-    public GoPos(int x, int y, int n, int s) {
-        this.n = n; this.stone = s;
-        int[] newxy = newXY(x, y, n);
-        this.x = newxy[0]; this.y = newxy[1];
-    }
+    @Override
+    public GoPosAbstract changeStone(int s) { return new GoPos(x, y, n, s); }
 
-    public GoPos(int x, int y, int[][] stones) {
-        this.n = stones.length;
-        int[] newxy = newXY(x, y, n);
-        this.x = newxy[0]; this.y = newxy[1];
-        this.stone = stones[y][x];
-    }
-
-    public GoPos changeStone(int s) { return new GoPos(x, y, n, s); }
-
-    public boolean equals(GoPos that) { return this.x == that.x && this.y == that.y; }
-
-    public String toString() {
-        return "[" + x + " | " + y + " – n" + n + "]";
+    @Override
+    public ArrayList<GoPosAbstract> neighbours(int[][] stones) {
+        ArrayList<GoPosAbstract> neighbours = new ArrayList<GoPosAbstract>();
+        if (y == 0 || y == n/2) {
+            int ny = y == 0 ? 1 : n/2-1;
+            int[] circles = stones[y];
+            for (int nx = 0; nx < circles.length; nx ++) {
+                neighbours.add(goPosOnStones(nx, ny, stones));
+            }
+        }
+        else {
+            neighbours.add(goPosOnStones(x, y-1, stones));
+            neighbours.add(goPosOnStones(x+1, y, stones));
+            neighbours.add(goPosOnStones(x, y+1, stones));
+            neighbours.add(goPosOnStones(x-1, y, stones));
+        }
+        return neighbours;
     }
 }

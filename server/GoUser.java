@@ -3,6 +3,7 @@ package server;
 import java.io.IOException;
 import java.net.Socket;
 
+import client.GoConsole;
 import data.GoConfig;
 import data.GoJoin;
 import data.GoMove;
@@ -52,8 +53,21 @@ public class GoUser extends GoSocket {
             else send("ERRYou are not in a game yet.");
         }
         if (message instanceof String) {
-            String str = (String) message;
-            if (str.equals("LISTGAMES")) send("INF\n" + server.listGames());
+            String sub = ((String) message).substring(0, 3);
+            String con = ((String) message).substring(3);
+            if (sub.equals("LST")) send("INF\n" + server.listGames());
+            if (sub.equals("NXT")) {
+                if (game != null) {
+                    try { 
+                        int me = Integer.parseInt(con);
+                        String error = game.playerNext(me);
+                        if (error != null) send("ERR " + error);
+                    }
+                    catch(NumberFormatException ex) {
+                        send("ERRCould not read id '"+con+"'.");
+                    }
+                }
+            }
         }
     }
 }

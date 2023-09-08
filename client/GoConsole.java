@@ -66,7 +66,7 @@ public class GoConsole implements Runnable {
             promts.put("cjgame", new GoPromt("cjgame", "Do you want to create <C> or join <J> a game or list all aviable games <L>?", GoPromt.STR, "[CJL]", args.length > 2 ? args[2] : null));
             GoPromt.promt(promts, reader, prmtstr);
             if (promts.get("cjgame").value.equals("L")) {
-                client.send("LISTGAMES");
+                client.send("LST");
                 sleep(500);
             }
         }
@@ -90,8 +90,8 @@ public class GoConsole implements Runnable {
                 client.send(config);
             }
             else {
-                promts.put("name", new GoPromt("name", "JOIN GAME: What's your name?", GoPromt.STR, NAMEPATTERN, args.length > 3 ? args[3] : null));
-                promts.put("id", new GoPromt("id", "JOIN GAME: Enter the id of your game.", GoPromt.INT, null, args.length > 4 ? Integer.parseInt(args[4]) : null));
+                promts.put("id", new GoPromt("id", "JOIN GAME: Enter the id of your game.", GoPromt.INT, null, args.length > 3 ? Integer.parseInt(args[3]) : null));
+                promts.put("name", new GoPromt("name", "JOIN GAME: What's your name?", GoPromt.STR, NAMEPATTERN, args.length > 4 ? args[4] : null));
                 GoPromt.promt(promts, reader, prmtstr);
 
                 GoJoin join = new GoJoin((String) promts.get("name").value, (int) promts.get("id").value);

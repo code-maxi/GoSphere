@@ -1,6 +1,8 @@
 package client;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+
 import data.*;
 import network.GoSocket;
 
@@ -31,18 +33,5 @@ public class GoClient extends GoSocket {
     }
 
     public static void main(String[] args) {
-        GoState state = new GoState(20, 2345).copy(0);
-        state.turn = 0;
-        for (int i = 0; i < state.stones.length; i ++) {
-            for (int j = 0; j < state.stones[i].length; j ++) {
-                int stone = (int)(Math.random() > 0.8 ? (Math.random() * 2d + 1) : 0);
-                state.stones[i][j] = stone;
-            }
-        }
-        state.labels[0] = "Erster Satz";
-        state.labels[1] = "Zweiter Satz";
-        state.turn = 1;
-        System.out.println("State____\n" + state);
-        new GoViewer(state, null);
     }
 }

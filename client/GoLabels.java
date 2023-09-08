@@ -10,12 +10,6 @@ import javax.swing.JPanel;
 import data.GoState;
 
 public class GoLabels extends JPanel implements Runnable {
-    public static final String[] INFO_TEXT = {
-        "The game has not begun yet. Waiting for an opponent...",
-        "It's your turn, click on an intercept point or pass by pressing <Ctrl+P>.",
-        "Waiting for the other person's move..."
-    };
-
     public static final Font[] LABEL_FONTS = {
         new Font(Font.MONOSPACED, Font.BOLD, 17),
         new Font(Font.MONOSPACED, Font.PLAIN, 17)
@@ -55,7 +49,7 @@ public class GoLabels extends JPanel implements Runnable {
 
     public void updateInfo() {
         info_label.setForeground(Color.BLACK);
-        info_label.setText(INFO_TEXT[state.turn == -1 ? 0 : (state.turn == state.me ? 1 : 2)]);
+        info_label.setText(state.header);
     }
 
     public void setState(GoState s) {

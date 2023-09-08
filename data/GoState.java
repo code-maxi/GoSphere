@@ -1,52 +1,60 @@
 package data;
-
-import java.io.Serializable;
 import java.util.Arrays;
 
-public class GoState implements Serializable {
-    public final int n;
-    public final int id;
+public class GoState extends GoStateAbstract {
+    public GoState(
+        int n, 
+        int id, 
+        int[][] stones, 
+        int[][] colors, 
+        String[] labels, 
+        int me, 
+        int turn,
+        int status
+    ) {
+        super(n, id, stones, colors, labels, me, turn, status);
+    }
+
+    public GoState(int n, int id) { super(n, id); }
+
+    public int[][] emptyArray(int n) {
+        int[][] arr = new int[n/2+1][n];
+        arr[0] = new int[1];
+        arr[n/2] = new int[1];
+        return arr;
+    }
     
-    public final int[][] stones; // 0: nothing, 1: black, 2: white
-    public final String[] labels;
-    public final int me;
-
-    public int turn;
-
-    public GoState(int n, int id, int[][] stones, String[] labels, int me, int turn) {
-        this.n = n;
-        this.id = id;
-        this.stones = stones;
-        this.labels = labels;
-        this.turn = turn;
-        this.me = me;
-    }
-
-    public GoState(int n, int id) {
-        this(n, id, new int[n][n], new String[2], -1, -1);
-        this.stones[0] = new int[1];
-        this.stones[n/2] = new int[1];
-    }
-
-    public GoState copy(int me) {
-        String[] copied_labels = Arrays.copyOf(labels, labels.length);
-        int[][] copied_stones = new int[n][n];
-        copied_stones[0] = new int[1];
-        copied_stones[n/2] = new int[1];
-        for (int i = 0; i < stones.length; i ++) {
-            copied_stones[i] = Arrays.copyOf(stones[i], stones[i].length);
-        }
-        return new GoState(n, id, copied_stones, copied_labels, me, turn);
-    }
-
-    public String toString() {
+    public String stringArray(int[][] stones) {
         String res = "";
         for (int[] row : stones) {
             res += "|  ";
             for (int stone : row) { res += stone + "  "; }
             res += "|\n";
         }
-        res += "n="+n + ", id="+id + ", labels=["+labels[0]+","+labels[1]+"], turn="+turn+", me="+me;
         return res;
+    }
+
+    public int[][] cloneArray(int[][] stones) {
+        int n = stones[1].length;
+        int[][] arr = new int[n/2+1][n];
+        arr[0] = new int[1];
+        arr[n/2] = new int[1];
+        for (int y = 0; y < stones.length; y ++) {
+            for (int x = 0; x < stones[y].length; x ++) {
+                arr[y][x] = stones[y][x];
+            }
+        }
+        return arr;
+    }
+
+    public GoStateAbstract copy(int me, int turn, int status) {
+        String[] copied_labels = Arrays.copyOf(labels, labels.length);
+        int[][] copied_stones = emptyArray(n);
+        int[][] copied_colors = emptyArray(n);
+        for (int i = 0; i < stones.length; i ++) {
+            copied_stones[i] = Arrays.copyOf(stones[i], stones[i].length);
+            copied_colors[i] = Arrays.copyOf(colors[i], colors[i].length);
+        }
+        return new GoState(n, id, copied_stones, copied_colors, copied_labels, me, turn, status);
     }
 }
