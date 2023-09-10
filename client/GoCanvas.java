@@ -63,6 +63,7 @@ public class GoCanvas extends GoCanvasAbstract {
                     for (GoCanvasPoint point : points) {
                         if (point.pos.equals(pos)) {
                             point.pos = pos;
+                            point.color = GoStateAbstract.color(state.colors[y][x]);
                             break;
                         }
                     }

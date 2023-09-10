@@ -27,7 +27,7 @@ public abstract class GoSocket implements Runnable {
             output.flush();
             input = new ObjectInputStream(socket.getInputStream());
             
-            System.out.println("Socket listening...");
+            //System.out.println("Socket listening...");
             while (!exit && !socket.isClosed()) {
                 try {
                     Object message = input.readObject();

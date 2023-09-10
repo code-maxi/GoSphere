@@ -79,7 +79,7 @@ public class GoServer implements Runnable {
 
     public static void main(String[] args) {
         try {
-            int port = args.length > 0 ? Integer.parseInt(args[0]) : 1234;
+            int port = args.length > 0 ? Integer.parseInt(args[0]) : 5555;
             boolean debug = args.length > 1 && args[1].equals("DEBUG");
             new GoServer(port, debug);
         }

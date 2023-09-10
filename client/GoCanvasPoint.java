@@ -116,7 +116,7 @@ public class GoCanvasPoint {
         }
         if (color != null) {
             g2.setColor(color);
-            g2.setStroke(new BasicStroke(3));
+            g2.setStroke(new BasicStroke(2));
             g2.draw(markedCircle_path);
         }
     }

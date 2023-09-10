@@ -1,2 +1,3 @@
-javac client/*.java data/*.java math/*.java server/*.java network/*.java
-java server.GoServer 1234
+cd ~/Programmieren/GoSphere/output/
+javac -d . ../client/*.java ../data/*.java ../math/*.java ../server/*.java ../network/*.java
+java server.GoServer 5555

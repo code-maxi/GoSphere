@@ -119,7 +119,7 @@ public class GoGame {
         if (players[1] == user) { players[1] = null; other = players[0]; }
         setStatus(GoStateAbstract.WAIT_STATUS);
         sendState();
-        if (other != null) other.send("GUISorry, your enemy left the game. That's why the game had to be restarted.");
+        if (other != null) other.send("GUISorry, your opponent left the game. That's why the game had to be restarted.");
     }
 
     public void setStatus(int status) {

@@ -1,2 +1,2 @@
-#javac client/*.java data/*.java math/*.java server/*.java network/*.java
-java client.GoConsole localhost 1234 J 1234 Player2
+cd ~/Programmieren/GoSphere/output/
+java client.GoConsole localhost 5555 J 5555 Player2
