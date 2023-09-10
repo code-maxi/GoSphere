@@ -42,12 +42,12 @@ public class GoCanvasPoint {
         };
         GoVector center = GoVector.polar(center_polar);
         GoVector[] stoneCircle = circleOnSphere(center_polar, Math.PI*STONE_RAD_FAC/pos.n,  STONE_RES);
-        GoVector[] markedCircle = color != null ? circleOnSphere(center_polar, Math.PI*STONE_RAD_FAC2/pos.n, STONE_RES) : null;
+        GoVector[] markedCircle = circleOnSphere(center_polar, Math.PI*STONE_RAD_FAC2/pos.n, STONE_RES);
         return new GoCanvasPoint(pos, color, center, stoneCircle, markedCircle);
     }
     
-    public final GoPosAbstract pos;
-    private final Color color;
+    public GoPosAbstract pos;
+    public Color color;
 
     public final GoVector center;
     private final GoVector[] stoneCircle;
@@ -83,8 +83,11 @@ public class GoCanvasPoint {
     }
 
     public void update(GoMatrix Trm) {
-        stoneCircle_path  = new Path2D.Double(); updatePath(stoneCircle_path,  stoneCircle,  Trm);
-        if (color != null) { markedCircle_path = new Path2D.Double(); updatePath(markedCircle_path, markedCircle, Trm); }
+        stoneCircle_path = new Path2D.Double(); updatePath(stoneCircle_path,  stoneCircle,  Trm);
+        if (color != null) {
+            markedCircle_path = new Path2D.Double();
+            updatePath(markedCircle_path, markedCircle, Trm);
+        }
         renderedCenter = Trm.mul(center);
         center_ellipse = new Ellipse2D.Double(
             renderedCenter.com[0] - 5, 
@@ -110,11 +113,10 @@ public class GoCanvasPoint {
                 g2.setStroke(new BasicStroke(2));
                 g2.setColor(Color.GRAY); g2.draw(stoneCircle_path);
             }
-            //g2.setColor(Color.RED); g2.fill(ellipse);
         }
         if (color != null) {
             g2.setColor(color);
-            g2.setStroke(new BasicStroke(2));
+            g2.setStroke(new BasicStroke(3));
             g2.draw(markedCircle_path);
         }
     }

@@ -18,6 +18,7 @@ public class GoClient extends GoSocket {
     }
 
     public void onMessage(Object message) {
+        //System.out.println("Client recieved " + message + "\n");
         if (message instanceof String) {
             String sub = ((String) message).substring(0, 3);
             String con = ((String) message).substring(3);

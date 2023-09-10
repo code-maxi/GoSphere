@@ -3,7 +3,6 @@ package server;
 import java.io.IOException;
 import java.net.Socket;
 
-import client.GoConsole;
 import data.GoConfig;
 import data.GoJoin;
 import data.GoMove;
@@ -20,7 +19,7 @@ public class GoUser extends GoSocket {
     }
 
     public void onMessage(Object message) {
-        System.out.println("User " + name + " recieved " + message);
+        if (server.DEBUG) System.out.println("User " + name + " recieved " + message);
         boolean isConfig = message instanceof GoConfig;
         boolean isJoin = message instanceof GoJoin;
         if (isConfig || isJoin) {
@@ -29,9 +28,9 @@ public class GoUser extends GoSocket {
                     GoConfig config = (GoConfig) message;
                     String error = server.createNewGame(config, this);
                     if (error == null) {
-                        send("INF The game with ID [" + GoServer.FORMAT_ID(game.state.id) + "] was created.\nWaiting for other player...");
+                        send("INFThe game with ID [" + GoServer.FORMAT_ID(game.state.id) + "] was created.\nWaiting for other player...");
                     }
-                    else send("ERR " + error);
+                    else send("ERR" + error);
                 }
                 if (isJoin) {
                     GoJoin join = (GoJoin) message;
@@ -39,7 +38,7 @@ public class GoUser extends GoSocket {
                     if (error == null) {
                         send("INFYou successfully joined the game. Have fun!");
                     }
-                    else send("ERR " + error);
+                    else send("ERR" + error);
                 }
             }
             else send("ERRYou are already in a game.");
@@ -61,12 +60,15 @@ public class GoUser extends GoSocket {
                     try { 
                         int me = Integer.parseInt(con);
                         String error = game.playerNext(me);
-                        if (error != null) send("ERR " + error);
+                        if (error != null) send("GUI" + error);
                     }
                     catch(NumberFormatException ex) {
                         send("ERRCould not read id '"+con+"'.");
                     }
                 }
+            }
+            if (sub.equals("BYE")) {
+                if (game != null) game.closeUser(this);
             }
         }
     }

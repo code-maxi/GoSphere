@@ -5,6 +5,7 @@ import javax.swing.*;
 import data.GoMove;
 import data.GoPosAbstract;
 import data.GoState;
+import data.GoStateAbstract;
 import math.GoMatrix;
 import math.GoVector;
 
@@ -24,7 +25,7 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
     protected double scale_state = 1;
     protected GoPosAbstract hover_pos;
     
-    protected double[][] wlist;
+    protected double[][] wlist = {{}, {}};
     
     protected GoMatrix Rot_old  = GoMatrix.unit();
     protected GoMatrix Rot_drag = GoMatrix.unit();
@@ -37,14 +38,12 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
 
     protected ArrayList<GoCanvasPoint> points = new ArrayList<GoCanvasPoint>();
 
-    public GoCanvasAbstract(GoState state, GoViewer viewer) {
+    public GoCanvasAbstract(GoViewer viewer) {
         super();
-        this.state = state;
         this.viewer = viewer;
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
-        setState(state);
     }
 
     public abstract void setState(GoState state);
@@ -91,10 +90,15 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
     @Override
     public void mouseMoved(MouseEvent e) {
         hover_pos = null;
-        for (GoCanvasPoint point : points) {
-            //if (state.turn == state.me && point.isHovered(e.getX(), e.getY()) && point.pos.s == 0) {
-            hover_pos = point.pos.changeStone(state.me+1);
-            break;
+        boolean running = (state.status == GoStateAbstract.RUNNING_STATUS && state.me == state.turn);
+        boolean delete = state.status == GoStateAbstract.DELETE_STATUS;
+        if (running || delete) {
+            for (GoCanvasPoint point : points) {
+                if (point.isHovered(e.getX(), e.getY())) {
+                    hover_pos = point.pos.changeStone(state.me+1);
+                    break;
+                }
+            }
         }
         repaint();
     }

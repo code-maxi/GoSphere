@@ -31,7 +31,7 @@ public class GoPos extends GoPosAbstract {
         ArrayList<GoPosAbstract> neighbours = new ArrayList<GoPosAbstract>();
         if (y == 0 || y == n/2) {
             int ny = y == 0 ? 1 : n/2-1;
-            int[] circles = stones[y];
+            int[] circles = stones[ny];
             for (int nx = 0; nx < circles.length; nx ++) {
                 neighbours.add(goPosOnStones(nx, ny, stones));
             }

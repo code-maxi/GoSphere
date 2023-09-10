@@ -6,13 +6,19 @@ import java.awt.Font;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 import data.GoState;
+import data.GoStateAbstract;
 
 public class GoLabels extends JPanel implements Runnable {
     public static final Font[] LABEL_FONTS = {
         new Font(Font.MONOSPACED, Font.BOLD, 17),
         new Font(Font.MONOSPACED, Font.PLAIN, 17)
+    };
+    public static final Border[] LABEL_BORDERS = {
+        BorderFactory.createLineBorder(Color.BLACK, 2, true),
+        BorderFactory.createLineBorder(Color.WHITE, 0, true)
     };
     public static final int ERROR_DELAY = 5000;
     
@@ -56,8 +62,9 @@ public class GoLabels extends JPanel implements Runnable {
         this.state = s;
         updateInfo();
         for (int i = 0; i < labels.length; i ++) {
-            labels[i].setFont(LABEL_FONTS[i == state.turn ? 0 : 1]);
-            labels[i].setText(state.labels[i]);
+            labels[i].setFont(LABEL_FONTS[state.status == GoStateAbstract.RUNNING_STATUS ? (i == state.turn ? 0 : 1) : 0]);
+            labels[i].setBorder(LABEL_BORDERS[i == state.turn ? 0 : 1]);
+            labels[i].setText(" "+state.labels[i]+" ");
         }
     }
 }

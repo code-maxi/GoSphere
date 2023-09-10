@@ -17,8 +17,8 @@ public abstract class GoStateAbstract implements Serializable {
 
     public static Color color(int c) {
         Color res = null;
-        if (c == BLACK) res = Color.BLACK;
-        if (c == WHITE) res = Color.WHITE;
+        if (c == BLACK) res = new Color(70, 70, 70, 255);
+        if (c == WHITE) res = new Color(220, 220, 220, 255);
         if (c == RED) res = Color.RED;
         if (c == BLUE) res = Color.BLUE;
         if (c == GREEN) res = Color.GREEN;
@@ -38,13 +38,13 @@ public abstract class GoStateAbstract implements Serializable {
     public String newHeader() {
         String header = "NO HEADER";
         if (this.me == 0 || this.me == 1) {
-            if (this.status == WAIT_STATUS) header = "The game has not begun yet. Press <Space> to start the game.";
+            if (this.status == WAIT_STATUS) header = "START STATE: The game has not begun yet. Press <Space> to start the game.";
             else if (this.status == RUNNING_STATUS) {
-                if (this.turn == this.me) header = "It is your turn, click on an intercept point or pass by pressing <Space>.";
-                else header = "Waiting for the other person's move...";
+                if (this.turn == this.me) header = "RUNNING STATE: It is your turn, click on an intercept point or pass by pressing <Space>.";
+                else header = "RUNNING STATE: Waiting for the other person's move...";
             }
-            else if (this.status == DELETE_STATUS) header = "The game has ended. Please delete all dead stones by marking them and pressing <Space> to finish.";
-            else if (this.status == END_STATUS) header = "The stones have been deleted and the game is finished. You can start aq rematch by pressing <Space>.";
+            else if (this.status == DELETE_STATUS) header = "DELETE STATE: The game has ended. Please delete all dead stones by marking them and pressing <Space> to finish.";
+            else if (this.status == END_STATUS) header = "END STATE: The stones have been deleted and the game is finished. You can start aq rematch by pressing <Space>.";
         }
         return header;
     }
@@ -78,7 +78,7 @@ public abstract class GoStateAbstract implements Serializable {
         this.labels = new String[2];
         this.me = -1;
         this.turn = -1;
-        this.status = WAIT_STATUS;
+        this.status = -1;
         this.header = this.newHeader();
     }
 
@@ -114,8 +114,8 @@ public abstract class GoStateAbstract implements Serializable {
     }
 
     public String toString() {
-        String res = stringArray(stones);
-        res += "n="+n + ", id="+id + ", labels=["+labels[0]+","+labels[1]+"], turn="+turn+", me="+me;
-        return res;
+        String resStones = stringArray(stones);
+        String resColors = stringArray(colors);
+        return "\nStones\n" + resStones + "\nColors\n" + resColors + "\nn="+n + ", id="+id + ", labels=["+labels[0]+","+labels[1]+"], turn="+turn+", me="+me;
     }
 }

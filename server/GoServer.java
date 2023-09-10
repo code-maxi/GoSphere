@@ -14,13 +14,15 @@ public class GoServer implements Runnable {
     public static String FORMAT_ID(int id) { return String.format("%04d", id); }
 
     public final HashMap<Integer, GoGame> games = new HashMap<Integer, GoGame>();
-    public ArrayList<Integer> used_ids = new ArrayList<Integer>();
     public final ServerSocket serverSocket;
+    public final boolean DEBUG;
+    public ArrayList<Integer> used_ids = new ArrayList<Integer>();
     public boolean exit = false;
     public int port;
 
-    public GoServer(int port) throws IOException {
+    public GoServer(int port, boolean debug) throws IOException {
         this.port = port;
+        this.DEBUG = debug;
         serverSocket = new ServerSocket(port);
         new Thread(this).start();
     }
@@ -48,7 +50,7 @@ public class GoServer implements Runnable {
         else if (conf.n < 4 || conf.n > 40 || conf.n % 4 != 0) return "The Size must be beween 0 and 40 and it must be divisible by 4.";
         else if (conf.first_color > 1) return "The color must be either 0 (black) or 1 (white).";
         else {
-            GoGame game = new GoGame(conf, id);
+            GoGame game = new GoGame(conf, id, DEBUG);
             user.name = conf.creator_name;
             user.game = game;
             game.addUser(user, conf.first_color);
@@ -58,7 +60,7 @@ public class GoServer implements Runnable {
     } 
 
     public void run() {
-        System.out.println("Server listening on port " + port + "...");
+        System.out.println("Server listening on port " + port + (DEBUG ? " in DEBUG mode" : "") + "...");
         while (!exit) {
             try {
                 Socket socket = serverSocket.accept();
@@ -78,7 +80,8 @@ public class GoServer implements Runnable {
     public static void main(String[] args) {
         try {
             int port = args.length > 0 ? Integer.parseInt(args[0]) : 1234;
-            new GoServer(port);
+            boolean debug = args.length > 1 && args[1].equals("DEBUG");
+            new GoServer(port, debug);
         }
         catch (Exception ex) { ex.printStackTrace(); }
     }

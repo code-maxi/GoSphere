@@ -17,7 +17,8 @@ public class GoViewer extends JFrame implements KeyListener, WindowListener {
     public GoViewer(GoState state, GoClient client) {
         super();
         this.client = client;
-        this.canvas = new GoCanvas(state, this);
+        this.canvas = new GoCanvas(this);
+        this.canvas.setState(state);
         this.labels = new GoLabels(state);
         setSize(800, 800);
 
@@ -38,7 +39,7 @@ public class GoViewer extends JFrame implements KeyListener, WindowListener {
     }
     public void doMove(GoMove move) {
         if (client != null) client.send(move);
-        System.out.println("Client MOVE: " + move);
+        //System.out.println("Client MOVE: " + move);
     }
     
     @Override
