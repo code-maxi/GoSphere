@@ -77,7 +77,7 @@ public class GoCanvas extends GoCanvasAbstract {
     @Override
     protected synchronized void updateMe() {
         super.updateMe();
-        for (GoCanvasStroke s : strokes) { s.update(Trm); }
+        for (GoCanvasStroke s : strokes) { s.update(Trm.connect(Rot)); } // UPDATED!
     }
 
     private synchronized void paintSphere(Graphics2D g2) {

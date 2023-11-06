@@ -60,9 +60,9 @@ public class GoCanvasCube extends GoCanvasAbstract {
             cubeFace.paint(g2, -1, hover_pos);
         }
 
-        double size = 10;
+        /*double size = 10;
         g2.setColor(Color.ORANGE);
         GoVector center = Trm.apply(new GoVector());
-        g2.fill(new Ellipse2D.Double(center.com[0], center.com[1], size, size));
+        g2.fill(new Ellipse2D.Double(center.com[0], center.com[1], size, size));*/
     }
 }

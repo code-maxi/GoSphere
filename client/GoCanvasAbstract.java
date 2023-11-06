@@ -79,9 +79,9 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
         Scl = GoMatrix.scale(scale, -scale, scale);
         Tsl = GoMatrix.translate(new GoVector(size[0]/2, size[1]/2, 0d));
 
-        Trm = Tsl.connect(Scl.connect(Rot));
+        Trm = Tsl.connect(Scl);
 
-        for (GoCanvasStoneAbstract p : stones.values()) { p.update(Trm); }
+        for (GoCanvasStoneAbstract p : stones.values()) { p.update(Trm, Rot); }
     }
 
     @Override

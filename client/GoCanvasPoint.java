@@ -86,13 +86,14 @@ public class GoCanvasPoint implements GoCanvasStoneAbstract {
         path.closePath();
     }
 
-    public void update(GoMatrix Trm) {
-        stoneCircle_path = new Path2D.Double(); updatePath(stoneCircle_path,  stoneCircle,  Trm);
+    public void update(GoMatrix Trm, GoMatrix Rot) {
+        GoMatrix T = Trm.connect(Rot);
+        stoneCircle_path = new Path2D.Double(); updatePath(stoneCircle_path,  stoneCircle,  T);
         if (color != null) {
             markedCircle_path = new Path2D.Double();
-            updatePath(markedCircle_path, markedCircle, Trm);
+            updatePath(markedCircle_path, markedCircle, T);
         }
-        renderedCenter = Trm.apply(center);
+        renderedCenter = T.apply(center);
         center_ellipse = new Ellipse2D.Double(
             renderedCenter.com[0] - 5, 
             renderedCenter.com[1] - 5, 

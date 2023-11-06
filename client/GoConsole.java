@@ -111,7 +111,7 @@ public class GoConsole implements Runnable {
 
     public static void main(String[] args) {
         //new GoConsole(args).listen();
-        GoStateAbstract state = new GoStateCube(3, 0);
+        GoStateAbstract state = new GoStateCube(10, 0);
         new GoViewer(state, null);
         /*GoStateAbstract state = new GoStateCube(3, 0);
         GoPosCube pos1 = new GoPosCube(6, 1, state.n, 1);
