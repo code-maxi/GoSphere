@@ -1,6 +1,9 @@
 package data;
 
 import java.io.Serializable;
+
+import math.GoColor;
+
 import java.awt.Color;
 
 public abstract class GoStateAbstract implements Serializable {
@@ -15,14 +18,14 @@ public abstract class GoStateAbstract implements Serializable {
     public static final int DELETE_STATUS = 2;
     public static final int END_STATUS = 3;
 
-    public static Color color(int c) {
+    public static GoColor color(int c) {
         Color res = null;
         if (c == BLACK) res = new Color(70, 70, 70, 255);
         if (c == WHITE) res = new Color(220, 220, 220, 255);
         if (c == RED) res = Color.RED;
         if (c == BLUE) res = Color.BLUE;
         if (c == GREEN) res = Color.GREEN;
-        return res;
+        return res != null ? GoColor.convertAWT(res) : null;
     }
 
     public final int n;

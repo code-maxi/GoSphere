@@ -7,7 +7,10 @@ import java.util.HashMap;
 
 import data.GoConfig;
 import data.GoJoin;
-import server.GoUser;
+import data.GoPosAbstract;
+import data.GoPosCube;
+import data.GoStateAbstract;
+import data.GoStateCube;
 
 public class GoConsole implements Runnable {
     public static final String ANSI_RESET = "\u001B[0m";
@@ -76,7 +79,7 @@ public class GoConsole implements Runnable {
                 promts.put("creator_name", new GoPromt("creator_name", "CREATE GAME: What's your name?", GoPromt.STR, NAMEPATTERN, args.length > 3 ? args[3] : null));
                 promts.put("n",            new GoPromt("n", "CREATE GAME: Enter the size of the game (between 4 and 40, devidable by 4).", GoPromt.INT, null, args.length > 4 ? Integer.parseInt(args[4]) : null));
                 promts.put("komi",         new GoPromt("komi", "CREATE GAME: Enter the komi.", GoPromt.DOUB, null, args.length > 5 ? Double.parseDouble(args[5]) : null));
-                promts.put("first_color",  new GoPromt("first_color", "CREATE GAME: Which color do you want to play width (black <0>, white <1>)?", GoPromt.INT, "[01]", args.length > 6 ? Integer.parseInt(args[6]) : null));
+                promts.put("first_color",  new GoPromt("first_color", "CREATE GAME: Which color do you want to play with (black <0>, white <1>)?", GoPromt.INT, "[01]", args.length > 6 ? Integer.parseInt(args[6]) : null));
                 GoPromt.promt(promts, reader, prmtstr);
 
                 GoConfig config = new GoConfig(
@@ -107,6 +110,14 @@ public class GoConsole implements Runnable {
     }
 
     public static void main(String[] args) {
-        new GoConsole(args).listen();
+        //new GoConsole(args).listen();
+        GoStateAbstract state = new GoStateCube(3, 0);
+        new GoViewer(state, null);
+        /*GoStateAbstract state = new GoStateCube(3, 0);
+        GoPosCube pos1 = new GoPosCube(6, 1, state.n, 1);
+        GoPosAbstract pos2 = pos1.shift1(-1, 0, state.stones).changeStone(2);
+        state.stones[pos1.y][pos1.x] = pos1.s;
+        state.stones[pos2.y][pos2.x] = pos2.s;
+        System.out.println(state.stringArray(state.stones));*/
     }
 }

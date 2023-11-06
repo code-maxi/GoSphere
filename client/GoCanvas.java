@@ -17,13 +17,13 @@ public class GoCanvas extends GoCanvasAbstract {
     public GoCanvas(GoViewer viewer) { super(viewer); }
 
     @Override
-    public void setState(GoState state) {
+    public synchronized void setState(GoStateAbstract state) {
         this.state = state;
         this.hover_pos = null;
 
         int[] wlistLength = { state.n/2 + 1, state.n + 1 };
-        System.out.println("WLIST SIZE 0 " + wlist[0].length + " vs. " + wlistLength[0]);
-        System.out.println("WLIST SIZE 1 " + wlist[1].length + " vs. " + wlistLength[1]);
+        /*System.out.println("WLIST SIZE 0 " + wlist[0].length + " vs. " + wlistLength[0]);
+        System.out.println("WLIST SIZE 1 " + wlist[1].length + " vs. " + wlistLength[1]);*/
         if (wlist[0].length != wlistLength[0] || wlist[1].length != wlistLength[1]) {
             this.wlist = new double[][] {
                 new double[wlistLength[0]],
@@ -39,8 +39,8 @@ public class GoCanvas extends GoCanvasAbstract {
             }
         }
 
-        int strokeSize = state.n/2-1 + state.n;
-        System.out.println("STROKE SIZE " + strokes.size() + " vs. " + strokeSize);
+        //int strokeSize = state.n/2-1 + state.n;
+        //System.out.println("STROKE SIZE " + strokes.size() + " vs. " + strokeSize);
         if (strokes.size() != state.n/2 + state.n) {
             strokes.clear();
             for (int y = 1; y < state.n/2; y ++) 
@@ -51,19 +51,19 @@ public class GoCanvas extends GoCanvasAbstract {
         }
         
         int pointsSize = (state.stones.length-2)*state.stones[1].length + 2;
-        System.out.println("POINTS SIZE " + points.size() + " vs. " + pointsSize);
-        if (points.size() != pointsSize) points.clear();
+        //System.out.println("POINTS SIZE " + points.size() + " vs. " + pointsSize);
+        if (stones.size() != pointsSize) stones.clear();
         for (int y = 0; y < state.stones.length; y ++) {
             for (int x = 0; x < state.stones[y].length; x ++) {
                 GoPosAbstract pos = GoPos.goPosOnStones(x, y, state.stones);
-                if (points.size() != pointsSize) {
-                    points.add(GoCanvasPoint.canvasPointOnSphere(pos, state.colors[y][x], wlist));
+                if (stones.size() != pointsSize) {
+                    putStone(GoCanvasPoint.canvasPointOnSphere(pos, state.colors[y][x], wlist));
                 }
                 else {
-                    for (GoCanvasPoint point : points) {
-                        if (point.pos.equals(pos)) {
-                            point.pos = pos;
-                            point.color = GoStateAbstract.color(state.colors[y][x]);
+                    for (GoCanvasStoneAbstract point : stones.values()) {
+                        if (point.getPos().equals(pos)) {
+                            point.setPos(pos);
+                            point.setColor(GoStateAbstract.color(state.colors[y][x]));
                             break;
                         }
                     }
@@ -75,9 +75,8 @@ public class GoCanvas extends GoCanvasAbstract {
     }
 
     @Override
-    protected void updateMe() {
+    protected synchronized void updateMe() {
         super.updateMe();
-        for (GoCanvasPoint p : points) { p.update(Trm); }
         for (GoCanvasStroke s : strokes) { s.update(Trm); }
     }
 
@@ -85,9 +84,9 @@ public class GoCanvas extends GoCanvasAbstract {
         // Paint Kugel
         for (GoCanvasStroke s : strokes) { s.paint(g2, 0); }
 
-        GoVector p1 = Tsl.mul(Scl).mul(new GoVector(-1, 1, 0));
-        GoVector p2 = Tsl.mul(Scl).mul(new GoVector(1, -1, 0));
-        GoVector p3 = Tsl.mul(Scl).mul(new GoVector(0, 0, 0));
+        GoVector p1 = Tsl.connect(Scl).apply(new GoVector(-1, 1, 0));
+        GoVector p2 = Tsl.connect(Scl).apply(new GoVector(1, -1, 0));
+        GoVector p3 = Tsl.connect(Scl).apply(new GoVector(0, 0, 0));
 
         float[] dim = {
             (float) p1.com[0],
@@ -109,8 +108,8 @@ public class GoCanvas extends GoCanvasAbstract {
 
     @Override
     public void paintMe(Graphics2D g2) {
-        for (GoCanvasPoint p : points) { p.paint(g2, 0, hover_pos); }
+        for (GoCanvasStoneAbstract p : stones.values()) { p.paint(g2, 0, hover_pos); }
         paintSphere(g2);
-        for (GoCanvasPoint p : points) { p.paint(g2, 1, hover_pos); }
+        for (GoCanvasStoneAbstract p : stones.values()) { p.paint(g2, 1, hover_pos); }
     }
 }

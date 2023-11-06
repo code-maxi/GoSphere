@@ -50,7 +50,7 @@ public class GoServer implements Runnable {
         else if (conf.n < 4 || conf.n > 40 || conf.n % 4 != 0) return "The Size must be beween 0 and 40 and it must be divisible by 4.";
         else if (conf.first_color > 1) return "The color must be either 0 (black) or 1 (white).";
         else {
-            GoGame game = new GoGame(conf, id, DEBUG);
+            GoGame game = new GoGame(this, conf, id, DEBUG);
             user.name = conf.creator_name;
             user.game = game;
             game.addUser(user, conf.first_color);

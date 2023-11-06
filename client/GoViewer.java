@@ -10,14 +10,14 @@ import data.*;
 import server.GoServer;
 
 public class GoViewer extends JFrame implements KeyListener, WindowListener {
-    public final GoCanvas canvas;
+    public final GoCanvasAbstract canvas;
     public final GoLabels labels;
     final GoClient client;
 
-    public GoViewer(GoState state, GoClient client) {
+    public GoViewer(GoStateAbstract state, GoClient client) {
         super();
         this.client = client;
-        this.canvas = new GoCanvas(this);
+        this.canvas = state instanceof GoStateCube ? new GoCanvasCube(this) : new GoCanvas(this);
         this.canvas.setState(state);
         this.labels = new GoLabels(state);
         setSize(800, 800);
@@ -33,7 +33,7 @@ public class GoViewer extends JFrame implements KeyListener, WindowListener {
         setAlwaysOnTop(true);
         setVisible(true);
     }
-    public void setState(GoState state) {
+    public void setState(GoStateAbstract state) {
         canvas.setState(state);
         labels.setState(state);
     }

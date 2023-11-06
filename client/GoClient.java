@@ -10,7 +10,7 @@ public class GoClient extends GoSocket {
     public boolean exit = false;
     public String connection = "";
     private GoViewer viewer;
-    public GoState state;
+    public GoStateAbstract state;
 
     public GoClient(String server, int port) throws IOException {
         super(new Socket(server, port));
@@ -26,8 +26,8 @@ public class GoClient extends GoSocket {
             if (sub.equals("INF")) System.out.println(GoConsole.ANSI_BLUE + "\nSERVER INFO: " + con + GoConsole.ANSI_RESET);
             if (sub.equals("GUI") && viewer != null) viewer.labels.showError(con); 
         }
-        if (message instanceof GoState) {
-            state = (GoState) message;
+        if (message instanceof GoStateAbstract) {
+            state = (GoStateAbstract) message;
             if (viewer == null) viewer = new GoViewer(state, this);
             else viewer.setState(state);
         }

@@ -25,8 +25,11 @@ public class GoGame {
     
     private final ArrayList<int[][]> history = new ArrayList<int[][]>();
 
-    public GoGame(GoConfig conf, int id, boolean debug) {
+    private final GoServer server;
+
+    public GoGame(GoServer server, GoConfig conf, int id, boolean debug) {
         this.conf = conf;
+        this.server = server;
         this.DEBUG = debug;
         this.state = new GoState(conf.n, id);
         setStatus(GoState.WAIT_STATUS);
@@ -120,6 +123,10 @@ public class GoGame {
         setStatus(GoStateAbstract.WAIT_STATUS);
         sendState();
         if (other != null) other.send("GUISorry, your opponent left the game. That's why the game had to be restarted.");
+        if (players[0] == null && players[1] == null) {
+            server.games.remove(state.id);
+            System.out.println("Go Game " + state.id + " was closed.");
+        }
     }
 
     public void setStatus(int status) {

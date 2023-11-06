@@ -24,9 +24,9 @@ public class GoLabels extends JPanel implements Runnable {
     
     private final JLabel[] labels = { new JLabel(), new JLabel() };
     private final JLabel info_label;
-    private GoState state;
+    private GoStateAbstract state;
 
-    public GoLabels(GoState state) {
+    public GoLabels(GoStateAbstract state) {
         super(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         labels[0].setForeground(Color.BLACK);
@@ -58,7 +58,7 @@ public class GoLabels extends JPanel implements Runnable {
         info_label.setText(state.header);
     }
 
-    public void setState(GoState s) {
+    public void setState(GoStateAbstract s) {
         this.state = s;
         updateInfo();
         for (int i = 0; i < labels.length; i ++) {

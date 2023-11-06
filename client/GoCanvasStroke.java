@@ -28,7 +28,7 @@ public class GoCanvasStroke {
         boolean[] paths_moved = {false, false};
 
         for (int i = 0; i <= STROKE_RES; i ++) {
-            double[] ren_pos = Trm.mul(circle[i % STROKE_RES]).com;
+            double[] ren_pos = Trm.apply(circle[i % STROKE_RES]).com;
             
             int pi = ren_pos[2] < 0 ? 0 : 1;
             Path2D.Double path = circle_path[pi];

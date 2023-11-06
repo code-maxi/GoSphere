@@ -5,7 +5,7 @@ import java.awt.geom.*;
 
 import math.*;
 
-public class GoCanvasPoint {
+public class GoCanvasPoint implements GoCanvasStoneAbstract {
     public static final Color[] STONE_COLORS = {
         new Color(0.1f, 0.1f, 0.1f, 1f),  // black
         new Color(1.0f, 1.0f, 1.0f, 1f),  // white
@@ -28,14 +28,14 @@ public class GoCanvasPoint {
                 Math.sin(a) * r,
                 length
             );
-            GoVector kar = Rot.mul(ka);
+            GoVector kar = Rot.apply(ka);
             vectors[i] = kar;
         }
         return vectors;
     }
 
     public static GoCanvasPoint canvasPointOnSphere(GoPosAbstract pos, int intcolor, double[][] wlist) {
-        Color color = GoState.color(intcolor);
+        GoColor color = GoState.color(intcolor);
         double[] center_polar = {
             wlist[0][pos.y], 
             wlist[1][pos.x]
@@ -47,7 +47,7 @@ public class GoCanvasPoint {
     }
     
     public GoPosAbstract pos;
-    public Color color;
+    public GoColor color;
 
     public final GoVector center;
     private final GoVector[] stoneCircle;
@@ -61,7 +61,7 @@ public class GoCanvasPoint {
     
     public GoCanvasPoint(
         GoPosAbstract pos, 
-        Color color, 
+        GoColor color, 
         GoVector center,
         GoVector[] stoneCircle, 
         GoVector[] markedCircle
@@ -73,9 +73,13 @@ public class GoCanvasPoint {
         this.markedCircle = markedCircle;
     }
 
+    public GoPosAbstract getPos() { return pos; }
+    public void setPos(GoPosAbstract pos) { this.pos = pos; }
+    public void setColor(GoColor color) { this.color = color; }
+
     private void updatePath(Path2D.Double path, GoVector[] circ, GoMatrix Trm) {
         for (int i = 0; i < circ.length; i ++) {
-            GoVector renpos = Trm.mul(circ[i]);
+            GoVector renpos = Trm.apply(circ[i]);
             if (i == 0) path.moveTo(renpos.com[0], renpos.com[1]);
             else        path.lineTo(renpos.com[0], renpos.com[1]);
         }
@@ -88,7 +92,7 @@ public class GoCanvasPoint {
             markedCircle_path = new Path2D.Double();
             updatePath(markedCircle_path, markedCircle, Trm);
         }
-        renderedCenter = Trm.mul(center);
+        renderedCenter = Trm.apply(center);
         center_ellipse = new Ellipse2D.Double(
             renderedCenter.com[0] - 5, 
             renderedCenter.com[1] - 5, 
@@ -96,11 +100,11 @@ public class GoCanvasPoint {
         );
     }
 
-    public void paint(Graphics2D g2, int layer, GoPosAbstract hover) { // layer: 0 = behind sphere, 1 = in front of sphere
+    public void paint(Graphics2D g2, int layer, GoPosAbstract hoverpos) { // layer: 0 = behind sphere, 1 = in front of sphere
         boolean is_behind = renderedCenter.com[2] < 0;
         if ((is_behind && layer == 0) || (!is_behind && layer == 1)) {
-            boolean hovered = hover != null && hover.equals(pos);
-            paintStone(g2, hovered ? hover.s : pos.s, hovered);
+            boolean hovered = hoverpos != null && hoverpos.equals(pos);
+            paintStone(g2, hovered ? hoverpos.s : pos.s, hovered);
         }
     }
 
@@ -115,7 +119,7 @@ public class GoCanvasPoint {
             }
         }
         if (color != null) {
-            g2.setColor(color);
+            g2.setColor(color.toAWT());
             g2.setStroke(new BasicStroke(2));
             g2.draw(markedCircle_path);
         }

@@ -4,14 +4,13 @@ import javax.swing.*;
 
 import data.GoMove;
 import data.GoPosAbstract;
-import data.GoState;
 import data.GoStateAbstract;
 import math.GoMatrix;
 import math.GoVector;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
+import java.util.TreeMap;
 
 public abstract class GoCanvasAbstract extends JPanel implements ActionListener, MouseMotionListener, MouseListener, MouseWheelListener {
     public static final double SCROLL_FAC = 0.05;
@@ -20,7 +19,7 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
 
     private final GoViewer viewer;
 
-    public GoState state;
+    public GoStateAbstract state;
 
     protected double scale_state = 1;
     protected GoPosAbstract hover_pos;
@@ -36,7 +35,10 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
     protected GoMatrix Tsl;
     protected GoMatrix Trm;
 
-    protected ArrayList<GoCanvasPoint> points = new ArrayList<GoCanvasPoint>();
+    protected TreeMap<String, GoCanvasStoneAbstract> stones = new TreeMap<>();
+    public void putStone(GoCanvasStoneAbstract stone) {
+        stones.put(stone.getPos().posString(), stone);
+    }
 
     public GoCanvasAbstract(GoViewer viewer) {
         super();
@@ -46,7 +48,7 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
         addMouseWheelListener(this);
     }
 
-    public abstract void setState(GoState state);
+    public abstract void setState(GoStateAbstract state);
     public abstract void paintMe(Graphics2D g2);
 
     @Override
@@ -69,15 +71,17 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
     }  
 
     // fitting object's size and position to window geometry
-    protected void updateMe() {
+    protected synchronized void updateMe() {
         double[] size = { (double) getSize().width, (double) getSize().height };
-        double scale = (size[0] < size[1] ? size[0] : size[1]) * 0.4 * scale_state;
+        double scale = Math.min(size[0], size[1]) * 0.4 * scale_state;
 
-        Rot = Rot_drag.mul(Rot_old);
+        Rot = Rot_drag.connect(Rot_old);
         Scl = GoMatrix.scale(scale, -scale, scale);
         Tsl = GoMatrix.translate(new GoVector(size[0]/2, size[1]/2, 0d));
 
-        Trm = Tsl.mul(Scl.mul(Rot));
+        Trm = Tsl.connect(Scl.connect(Rot));
+
+        for (GoCanvasStoneAbstract p : stones.values()) { p.update(Trm); }
     }
 
     @Override
@@ -104,9 +108,9 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
         boolean running = (state.status == GoStateAbstract.RUNNING_STATUS && state.me == state.turn);
         boolean delete = state.status == GoStateAbstract.DELETE_STATUS;
         if (running || delete) {
-            for (GoCanvasPoint point : points) {
+            for (GoCanvasStoneAbstract point : stones.values()) {
                 if (point.isHovered(e.getX(), e.getY())) {
-                    hover_pos = point.pos.changeStone(state.me+1);
+                    hover_pos = point.getPos().changeStone(state.me+1);
                     break;
                 }
             }
@@ -127,7 +131,7 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
     }
 
     public void mouseReleased(MouseEvent e) {
-        Rot_old  = Rot_drag.mul(Rot_old);
+        Rot_old  = Rot_drag.connect(Rot_old);
         Rot_drag = GoMatrix.unit();
         if (hover_pos != null) {
             GoVector delta = new GoVector(

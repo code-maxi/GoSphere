@@ -5,7 +5,7 @@ public class GoMatrix {
     public GoMatrix(double[][] com) {
         this.com = com;
     }
-    public GoVector mul(GoVector vec) {
+    public GoVector apply(GoVector vec) {
         GoVector vec2 = null;
         if (vec.com.length == this.com[0].length) {
             vec2 = new GoVector();
@@ -22,7 +22,7 @@ public class GoMatrix {
         return vec2;
     }
 
-    public GoMatrix mul(GoMatrix A) {
+    public GoMatrix connect(GoMatrix A) {
         double[][] firstMatrix = this.com;
         double[][] secondMatrix = A.com;
         double[][] result = new double[firstMatrix.length][secondMatrix[0].length];
@@ -37,6 +37,14 @@ public class GoMatrix {
             }
         }
         return new GoMatrix(result);
+    }
+
+    public GoVector[] applyAll(GoVector[] vectors) {
+        GoVector[] result = new GoVector[vectors.length];
+        for (int i = 0; i < vectors.length; i ++) {
+            result[i] = this.apply(vectors[i]);
+        }
+        return result;
     }
 
     public String toString() {
@@ -57,6 +65,8 @@ public class GoMatrix {
             { 0, 0, 0, 1 }
         });
     }
+
+    public static GoMatrix scale(double s) { return scale(s,s,s); }
 
     public static GoMatrix unit() {
         return new GoMatrix(new double[][] {
@@ -96,8 +106,8 @@ public class GoMatrix {
 
     public static GoMatrix rotate(GoVector rot) {
         return GoMatrix.rotateZ(rot.com[2])
-            .mul(GoMatrix.rotateY(rot.com[1])
-            .mul(GoMatrix.rotateX(rot.com[0])));
+            .connect(GoMatrix.rotateY(rot.com[1])
+            .connect(GoMatrix.rotateX(rot.com[0])));
     }
 
     public static GoMatrix translate(GoVector d) {
