@@ -8,7 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import data.GoState;
+import data.GoStateSphere;
 import data.GoStateAbstract;
 
 public class GoLabels extends JPanel implements Runnable {

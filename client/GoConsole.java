@@ -77,9 +77,10 @@ public class GoConsole implements Runnable {
         while (client.state == null) {
             if (promts.get("cjgame").value.equals("C")) {
                 promts.put("creator_name", new GoPromt("creator_name", "CREATE GAME: What's your name?", GoPromt.STR, NAMEPATTERN, args.length > 3 ? args[3] : null));
-                promts.put("n",            new GoPromt("n", "CREATE GAME: Enter the size of the game (between 4 and 40, devidable by 4).", GoPromt.INT, null, args.length > 4 ? Integer.parseInt(args[4]) : null));
-                promts.put("komi",         new GoPromt("komi", "CREATE GAME: Enter the komi.", GoPromt.DOUB, null, args.length > 5 ? Double.parseDouble(args[5]) : null));
-                promts.put("first_color",  new GoPromt("first_color", "CREATE GAME: Which color do you want to play with (black <0>, white <1>)?", GoPromt.INT, "[01]", args.length > 6 ? Integer.parseInt(args[6]) : null));
+                promts.put("object",       new GoPromt("object", "CREATE GAME: Do you want to play on a sphere or on a cube? (sphere <"+GoConfig.SPHERE_OBJECT+">, cube <"+GoConfig.CUBE_OBJECT+">)?", GoPromt.INT, null, args.length > 4 ? Integer.parseInt(args[4]) : null));
+                promts.put("n",            new GoPromt("n", "CREATE GAME: Enter the size of the game (between 4 and 40, devidable by 4).", GoPromt.INT, null, args.length > 5 ? Integer.parseInt(args[5]) : null));
+                promts.put("komi",         new GoPromt("komi", "CREATE GAME: Enter the komi.", GoPromt.DOUB, null, args.length > 6 ? Double.parseDouble(args[6]) : null));
+                promts.put("first_color",  new GoPromt("first_color", "CREATE GAME: Which color do you want to play with (black <0>, white <1>)?", GoPromt.INT, "[01]", args.length > 7 ? Integer.parseInt(args[7]) : null));
                 GoPromt.promt(promts, reader, prmtstr);
 
                 GoConfig config = new GoConfig(
@@ -87,7 +88,8 @@ public class GoConsole implements Runnable {
                     (int) promts.get("n").value,
                     (int) args.length > 7 ? Integer.parseInt(args[7]) : -1,
                     (int) promts.get("first_color").value, 0,
-                    (String) promts.get("creator_name").value
+                    (String) promts.get("creator_name").value,
+                    (int) promts.get("object").value
                 );
                 
                 client.send(config);
@@ -111,7 +113,8 @@ public class GoConsole implements Runnable {
 
     public static void main(String[] args) {
         //new GoConsole(args).listen();
-        GoStateAbstract state = new GoStateCube(10, 0);
+        GoStateAbstract state = new GoStateCube(3, 0);
+        state = state.copy(1, state.turn, GoStateAbstract.DELETE_STATUS);
         new GoViewer(state, null);
         /*GoStateAbstract state = new GoStateCube(3, 0);
         GoPosCube pos1 = new GoPosCube(6, 1, state.n, 1);

@@ -17,10 +17,12 @@ public class GoStateCube extends GoStateAbstract {
 
     public GoStateCube(int n, int id) { super(n, id); }
 
+    @Override
     public int[][] emptyArray(int n) {
         return new int[n][6*n];
     }
     
+    @Override
     public String stringArray(int[][] stones) {
         String res = "";
         for (int y = 0; y < n; y ++) {
@@ -45,6 +47,7 @@ public class GoStateCube extends GoStateAbstract {
         return res;
     }
 
+    @Override
     public int[][] cloneArray(int[][] stones) {
         int[][] arr = new int[n][6*n];
         for (int y = 0; y < stones.length; y ++) {
@@ -55,14 +58,15 @@ public class GoStateCube extends GoStateAbstract {
         return arr;
     }
 
+    @Override
     public GoStateAbstract copy(int me, int turn, int status) {
         String[] copied_labels = Arrays.copyOf(labels, labels.length);
-        int[][] copied_stones = emptyArray(n);
-        int[][] copied_colors = emptyArray(n);
-        for (int i = 0; i < stones.length; i ++) {
-            copied_stones[i] = Arrays.copyOf(stones[i], stones[i].length);
-            copied_colors[i] = Arrays.copyOf(colors[i], colors[i].length);
-        }
-        return new GoStateCube(n, id, copied_stones, copied_colors, copied_labels, me, turn, status);
+        int[][][] copied_sc = copy_stones_colors();
+        return new GoStateCube(n, id, copied_sc[0], copied_sc[1], copied_labels, me, turn, status);
+    }
+
+    @Override
+    public GoPosAbstract posOnMe(int x, int y) {
+        return new GoPosCube(x, y, stones.length, stones[y][x]);
     }
 }

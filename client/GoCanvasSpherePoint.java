@@ -5,7 +5,7 @@ import java.awt.geom.*;
 
 import math.*;
 
-public class GoCanvasPoint implements GoCanvasStoneAbstract {
+public class GoCanvasSpherePoint implements GoCanvasStoneAbstract {
     public static final Color[] STONE_COLORS = {
         new Color(0.1f, 0.1f, 0.1f, 1f),  // black
         new Color(1.0f, 1.0f, 1.0f, 1f),  // white
@@ -34,8 +34,8 @@ public class GoCanvasPoint implements GoCanvasStoneAbstract {
         return vectors;
     }
 
-    public static GoCanvasPoint canvasPointOnSphere(GoPosAbstract pos, int intcolor, double[][] wlist) {
-        GoColor color = GoState.color(intcolor);
+    public static GoCanvasSpherePoint canvasPointOnSphere(GoPosAbstract pos, int intcolor, double[][] wlist) {
+        GoColor color = GoStateSphere.color(intcolor);
         double[] center_polar = {
             wlist[0][pos.y], 
             wlist[1][pos.x]
@@ -43,7 +43,7 @@ public class GoCanvasPoint implements GoCanvasStoneAbstract {
         GoVector center = GoVector.polar(center_polar);
         GoVector[] stoneCircle = circleOnSphere(center_polar, Math.PI*STONE_RAD_FAC/pos.n,  STONE_RES);
         GoVector[] markedCircle = circleOnSphere(center_polar, Math.PI*STONE_RAD_FAC2/pos.n, STONE_RES);
-        return new GoCanvasPoint(pos, color, center, stoneCircle, markedCircle);
+        return new GoCanvasSpherePoint(pos, color, center, stoneCircle, markedCircle);
     }
     
     public GoPosAbstract pos;
@@ -59,7 +59,7 @@ public class GoCanvasPoint implements GoCanvasStoneAbstract {
     public Path2D.Double stoneCircle_path;
     public Path2D.Double markedCircle_path;
     
-    public GoCanvasPoint(
+    public GoCanvasSpherePoint(
         GoPosAbstract pos, 
         GoColor color, 
         GoVector center,
@@ -111,7 +111,7 @@ public class GoCanvasPoint implements GoCanvasStoneAbstract {
 
     private void paintStone(Graphics2D g2, int stone, boolean hovered) {
         if (stone > 0) {
-            Color color = GoCanvasPoint.STONE_COLORS[stone-1 + (hovered ? 2 : 0)];
+            Color color = GoCanvasSpherePoint.STONE_COLORS[stone-1 + (hovered ? 2 : 0)];
             g2.setColor(color); g2.fill(stoneCircle_path);
 
             if (stone == 2) {

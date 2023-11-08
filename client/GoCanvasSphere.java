@@ -5,16 +5,16 @@ import data.*;
 import java.util.ArrayList;
 import math.*;
 
-public class GoCanvas extends GoCanvasAbstract {
+public class GoCanvasSphere extends GoCanvasAbstract {
     public static final Color[] SPHERE_COLORS = {
         new Color(0.8f, 0.8f, 0.8f, 0.9f),
         new Color(0.4f, 0.4f, 0.4f, 0.96f)
     };
     public static final float[] SPHERE_DIST = {0.45f, 1.0f};
 
-    private ArrayList<GoCanvasStroke> strokes = new ArrayList<GoCanvasStroke>();
+    private ArrayList<GoCanvasSphereStroke> strokes = new ArrayList<GoCanvasSphereStroke>();
 
-    public GoCanvas(GoViewer viewer) { super(viewer); }
+    public GoCanvasSphere(GoViewer viewer) { super(viewer); }
 
     @Override
     public synchronized void setState(GoStateAbstract state) {
@@ -44,10 +44,10 @@ public class GoCanvas extends GoCanvasAbstract {
         if (strokes.size() != state.n/2 + state.n) {
             strokes.clear();
             for (int y = 1; y < state.n/2; y ++) 
-                strokes.add(new GoCanvasStroke(new int[]{0, y}, wlist));
+                strokes.add(new GoCanvasSphereStroke(new int[]{0, y}, wlist));
 
             for (int x = 0; x < state.n; x ++) 
-                strokes.add(new GoCanvasStroke(new int[]{1, x}, wlist));
+                strokes.add(new GoCanvasSphereStroke(new int[]{1, x}, wlist));
         }
         
         int pointsSize = (state.stones.length-2)*state.stones[1].length + 2;
@@ -55,9 +55,9 @@ public class GoCanvas extends GoCanvasAbstract {
         if (stones.size() != pointsSize) stones.clear();
         for (int y = 0; y < state.stones.length; y ++) {
             for (int x = 0; x < state.stones[y].length; x ++) {
-                GoPosAbstract pos = GoPos.goPosOnStones(x, y, state.stones);
+                GoPosAbstract pos = state.posOnMe(x, y);
                 if (stones.size() != pointsSize) {
-                    putStone(GoCanvasPoint.canvasPointOnSphere(pos, state.colors[y][x], wlist));
+                    putStone(GoCanvasSpherePoint.canvasPointOnSphere(pos, state.colors[y][x], wlist));
                 }
                 else {
                     for (GoCanvasStoneAbstract point : stones.values()) {
@@ -77,12 +77,12 @@ public class GoCanvas extends GoCanvasAbstract {
     @Override
     protected synchronized void updateMe() {
         super.updateMe();
-        for (GoCanvasStroke s : strokes) { s.update(Trm.connect(Rot)); } // UPDATED!
+        for (GoCanvasSphereStroke s : strokes) { s.update(Trm.connect(Rot)); } // UPDATED!
     }
 
     private synchronized void paintSphere(Graphics2D g2) {
         // Paint Kugel
-        for (GoCanvasStroke s : strokes) { s.paint(g2, 0); }
+        for (GoCanvasSphereStroke s : strokes) { s.paint(g2, 0); }
 
         GoVector p1 = Tsl.connect(Scl).apply(new GoVector(-1, 1, 0));
         GoVector p2 = Tsl.connect(Scl).apply(new GoVector(1, -1, 0));
@@ -99,11 +99,11 @@ public class GoCanvas extends GoCanvasAbstract {
 
         Point2D center = new Point2D.Float(dim[4], dim[5]);
         float radius = dim[2] / 2;
-        g2.setPaint(new RadialGradientPaint(center, radius, GoCanvas.SPHERE_DIST, GoCanvas.SPHERE_COLORS));
+        g2.setPaint(new RadialGradientPaint(center, radius, GoCanvasSphere.SPHERE_DIST, GoCanvasSphere.SPHERE_COLORS));
 
         g2.fill(new Ellipse2D.Double(dim[0], dim[1], dim[2], dim[3]));
 
-        for (GoCanvasStroke s : strokes) { s.paint(g2, 1); }
+        for (GoCanvasSphereStroke s : strokes) { s.paint(g2, 1); }
     }
 
     @Override

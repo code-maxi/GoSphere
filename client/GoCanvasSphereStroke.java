@@ -3,16 +3,16 @@ import java.awt.*;
 import java.awt.geom.*;
 import math.*;
 
-public class GoCanvasStroke {
+public class GoCanvasSphereStroke {
     public static final int STROKE_RES = 38*2;
 
     private GoVector[] circle = new GoVector[STROKE_RES];
     public Path2D.Double[] circle_path;
 
-    public GoCanvasStroke(int[] coord, double[][] wlist) {
+    public GoCanvasSphereStroke(int[] coord, double[][] wlist) {
         double w = wlist[coord[0]][coord[1]];
         for (int i = 0; i < STROKE_RES; i ++) {
-            double wi = (double) i / (double) GoCanvasStroke.STROKE_RES * 2 * Math.PI;
+            double wi = (double) i / (double) GoCanvasSphereStroke.STROKE_RES * 2 * Math.PI;
             double[] polar = coord[0] == 0 ? new double[]{w, wi} : new double[]{wi, w};
 
             GoVector vec = GoVector.polar(polar);

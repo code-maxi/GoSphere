@@ -92,8 +92,8 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
 
             Rot_drag = GoMatrix.rotate(
                 new GoVector(
-                    (drag_pos[1][1] - drag_pos[0][1]) * GoCanvas.DRAG_FAC,
-                    (drag_pos[1][0] - drag_pos[0][0]) * GoCanvas.DRAG_FAC,
+                    (drag_pos[1][1] - drag_pos[0][1]) * GoCanvasSphere.DRAG_FAC,
+                    (drag_pos[1][0] - drag_pos[0][0]) * GoCanvasSphere.DRAG_FAC,
                     0
                 )
             );
@@ -109,7 +109,7 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
         boolean delete = state.status == GoStateAbstract.DELETE_STATUS;
         if (running || delete) {
             for (GoCanvasStoneAbstract point : stones.values()) {
-                if (point.isHovered(e.getX(), e.getY())) {
+                if (point.getPos().s == 0 && point.isHovered(e.getX(), e.getY())) {
                     hover_pos = point.getPos().changeStone(state.me+1);
                     break;
                 }
@@ -148,7 +148,7 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
     public void actionPerformed(ActionEvent evt) {}
 
     public void mouseWheelMoved(MouseWheelEvent e) {
-        scale_state += e.getWheelRotation() * GoCanvas.SCROLL_FAC * scale_state;
+        scale_state += e.getWheelRotation() * GoCanvasSphere.SCROLL_FAC * scale_state;
         repaint();
     }
 }

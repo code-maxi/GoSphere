@@ -1,6 +1,7 @@
 package data;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import math.GoColor;
 
@@ -85,10 +86,20 @@ public abstract class GoStateAbstract implements Serializable {
         this.header = this.newHeader();
     }
 
+    public abstract GoPosAbstract posOnMe(int x, int y);
     public abstract int[][] emptyArray(int n);
     public abstract String stringArray(int[][] stones);
     public abstract int[][] cloneArray(int[][] stones);
     public abstract GoStateAbstract copy(int me, int turn, int status);
+
+    protected int[][][] copy_stones_colors() {
+        int[][][] copied_sc = { emptyArray(n), emptyArray(n) };
+        for (int i = 0; i < stones.length; i ++) {
+            copied_sc[0][i] = Arrays.copyOf(stones[i], stones[i].length);
+            copied_sc[1][i] = Arrays.copyOf(colors[i], colors[i].length);
+        }
+        return copied_sc;
+    }
 
     public void clearArray(boolean clearStones, boolean clearColors) {
         for (int y = 0; y < stones.length; y ++) {

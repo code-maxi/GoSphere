@@ -26,7 +26,7 @@ public abstract class GoPosAbstract implements Serializable {
     
     public int[] newXY(int x, int y) { return new int[]{x, y}; }
     
-    public abstract ArrayList<GoPosAbstract> neighbours(int[][] stones);
+    public abstract ArrayList<GoPosAbstract> neighbours(GoStateAbstract state);
     public abstract GoPosAbstract changeStone(int s);
 
     public boolean equals(Object that) {

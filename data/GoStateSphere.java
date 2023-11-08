@@ -1,8 +1,8 @@
 package data;
 import java.util.Arrays;
 
-public class GoState extends GoStateAbstract {
-    public GoState(
+public class GoStateSphere extends GoStateAbstract {
+    public GoStateSphere(
         int n, 
         int id, 
         int[][] stones, 
@@ -15,7 +15,7 @@ public class GoState extends GoStateAbstract {
         super(n, id, stones, colors, labels, me, turn, status);
     }
 
-    public GoState(int n, int id) { super(n, id); }
+    public GoStateSphere(int n, int id) { super(n, id); }
 
     public int[][] emptyArray(int n) {
         int[][] arr = new int[n/2+1][n];
@@ -49,12 +49,14 @@ public class GoState extends GoStateAbstract {
 
     public GoStateAbstract copy(int me, int turn, int status) {
         String[] copied_labels = Arrays.copyOf(labels, labels.length);
-        int[][] copied_stones = emptyArray(n);
-        int[][] copied_colors = emptyArray(n);
-        for (int i = 0; i < stones.length; i ++) {
-            copied_stones[i] = Arrays.copyOf(stones[i], stones[i].length);
-            copied_colors[i] = Arrays.copyOf(colors[i], colors[i].length);
-        }
-        return new GoState(n, id, copied_stones, copied_colors, copied_labels, me, turn, status);
+        int[][][] copied_sc = copy_stones_colors();
+        return new GoStateSphere(n, id, copied_sc[0], copied_sc[1], copied_labels, me, turn, status);
+    }
+
+    @Override
+    public GoPosAbstract posOnMe(int x, int y) {
+        GoPosAbstract pos = new GoPosSphere(x, y, stones[1].length, 0);
+        pos = pos.changeStone(stones[pos.y][pos.x]);
+        return pos;
     }
 }

@@ -3,10 +3,10 @@ package server;
 import java.util.ArrayList;
 import data.GoConfig;
 import data.GoMove;
-import data.GoPos;
 import data.GoPosAbstract;
-import data.GoState;
+import data.GoStateSphere;
 import data.GoStateAbstract;
+import data.GoStateCube;
 
 public class GoGame {
     public static final int STATUS_DELAY = 1000;
@@ -31,8 +31,8 @@ public class GoGame {
         this.conf = conf;
         this.server = server;
         this.DEBUG = debug;
-        this.state = new GoState(conf.n, id);
-        setStatus(GoState.WAIT_STATUS);
+        this.state = (conf.object == GoConfig.CUBE_OBJECT) ? new GoStateCube(conf.n, id) : new GoStateSphere(conf.n, id);
+        setStatus(GoStateAbstract.WAIT_STATUS);
     }
 
     public String addUser(GoUser user, int p) {
@@ -40,7 +40,7 @@ public class GoGame {
         if (players[player] == null) {
             players[player] = user;
             if (DEBUG && players[0] != null && players[1] != null) {
-                setStatus(GoState.RUNNING_STATUS);
+                setStatus(GoStateAbstract.RUNNING_STATUS);
             }
             sendState();
             return null;
@@ -171,9 +171,9 @@ public class GoGame {
 
         for (int y = 0; y < state.stones.length; y ++) {
             for (int x = 0; x < state.stones[y].length; x ++) {
-                GoPosAbstract pos = GoPos.goPosOnStones(x, y, state.stones);
+                GoPosAbstract pos = state.posOnMe(x, y);
                 if (!usedPositions.contains(pos) && pos.s == 0) {
-                    GoStoneGroup group = new GoStoneGroup().fill(pos, state.stones, new int[] { 0, enemy(color) });
+                    GoStoneGroup group = new GoStoneGroup().fill(pos, state, new int[] { 0, enemy(color) });
                     for (GoPosAbstract stone : group.stones) usedPositions.add(stone);
                     if (!group.containColor(enemy(color))) {
                         groups.add(group);
@@ -235,17 +235,17 @@ public class GoGame {
 
                 pos = pos.changeStone(state.stones[pos.y][pos.x]);
 
-                ArrayList<GoPosAbstract> neighbours = pos.neighbours(state.stones);
+                ArrayList<GoPosAbstract> neighbours = pos.neighbours(state);
                 if (MARKSTONES) {
-                    for (GoPosAbstract stone : neighbours) state.colors[stone.y][stone.x] = GoState.GREEN;
+                    for (GoPosAbstract stone : neighbours) state.colors[stone.y][stone.x] = GoStateAbstract.GREEN;
                 }
 
                 for (GoPosAbstract neighbour : neighbours) {
                     if (pos.s == enemy(neighbour.s)) {
-                        GoStoneGroup group = new GoStoneGroup().fill(neighbour, state.stones);
+                        GoStoneGroup group = new GoStoneGroup().fill(neighbour, state);
                         if (MARKSTONES) {
-                            for (GoPosAbstract stone : group.stones) state.colors[stone.y][stone.x] = GoState.RED;
-                            for (GoPosAbstract stone : group.liberties) state.colors[stone.y][stone.x] = GoState.BLUE;
+                            for (GoPosAbstract stone : group.stones) state.colors[stone.y][stone.x] = GoStateAbstract.RED;
+                            for (GoPosAbstract stone : group.liberties) state.colors[stone.y][stone.x] = GoStateAbstract.BLUE;
                         }
 
                         if (group.liberties.size() == 0) {
@@ -257,7 +257,7 @@ public class GoGame {
                     }
                 }
 
-                GoStoneGroup currentGroup = new GoStoneGroup().fill(pos, state.stones);
+                GoStoneGroup currentGroup = new GoStoneGroup().fill(pos, state);
                 if (currentGroup.liberties.size() == 0){
                     state.updateArray(last_state);
                     return "MOVEERROR: Suicide is not allowed!";
@@ -295,6 +295,7 @@ public class GoGame {
             players[0] != null ? players[0].name : "[-]", 
             players[1] != null ? players[1].name : "[-]"
         };
-        return "Game ["+ GoServer.FORMAT_ID(state.id) + "], players: " + names[0] + " (black) : " + names[1] + " (white)";
+        String type = conf.object == GoConfig.CUBE_OBJECT ? "CUBE" : "SPHERE";
+        return " Game ["+ GoServer.FORMAT_ID(state.id) + "], <"+type+">, players: " + names[0] + " (black) : " + names[1] + " (white)";
     }
 }
