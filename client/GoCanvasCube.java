@@ -9,13 +9,14 @@ public class GoCanvasCube extends GoCanvasAbstract {
     public synchronized void setState(GoStateAbstract state) {
         this.state = state;
         this.hover_pos = null;
-        stones.clear();
 
-        
         for (int y = 0; y < state.stones.length; y ++) {
             for (int x = 0; x < state.n*6; x ++) {
-                GoPosCube pos = new GoPosCube(x, y, state.n, state.stones[y][x]);
-                putStone(GoCanvasCubeFace.createFace(pos, state.colors[y][x]));
+                GoPosAbstract pos = state.posOnMe(x, y);
+                GoCanvasStoneAbstract stone = stones.get(pos.toString());
+                
+                if (stone == null) putStone(GoCanvasCubeFace.createFace(pos, state.colors[y][x]));
+                else stone.setPosColor(pos, GoStateAbstract.color(state.colors[y][x]));
             }
         }
 
@@ -24,16 +25,6 @@ public class GoCanvasCube extends GoCanvasAbstract {
 
     @Override
     public void paintMe(Graphics2D g2) {
-        /*g2.setRenderingHint(
-            RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(
-            RenderingHints.KEY_TEXT_ANTIALIASING,
-            RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2.setRenderingHint(
-            RenderingHints.KEY_FRACTIONALMETRICS,
-            RenderingHints.VALUE_FRACTIONALMETRICS_ON);*/
-
         for (GoCanvasStoneAbstract s : stones.values()) { s.paint(g2, 1, hover_pos); }
         for (GoCanvasStoneAbstract s : stones.values()) { s.paint(g2, 0, hover_pos); }
 

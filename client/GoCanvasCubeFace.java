@@ -96,10 +96,7 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
     public GoPosAbstract getPos() { return pos; }
     
     @Override
-    public void setPos(GoPosAbstract pos) { this.pos = pos; }
-
-    @Override
-    public void setColor(GoColor color) { this.markcolor = color; }
+    public void setPosColor(GoPosAbstract pos, GoColor color) { this.pos = pos; this.markcolor = color; }
 
     public double angle = 0;
     public int layer = 0;
@@ -107,21 +104,19 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
 
     public void update(GoMatrix Trm, GoMatrix Rot) {
         for (int y = 0; y < points.length; y ++) {
-            if ((y == 1 && stone > 0) || (y == 2 && markcolor != null) || (y != 1 && y != 2)) {
-                Path2D.Double path = new Path2D.Double();
-                for (int x = 0; x < points[0].length; x ++) {
-                    if (points[y][x] != null) {
-                        trans[y][x] = Rot.apply(points[y][x]);
-                        double zoom = 1 + trans[y][x].com[2] * PERSPECTIVE_Z_INFLUENCE;
-                        trans[y][x] = Trm.connect(GoMatrix.scale(zoom, zoom, 1)).apply(trans[y][x]);
-                        GoVector rp = trans[y][x];
-                        if (x == 0) path.moveTo(rp.com[0], rp.com[1]);
-                        else        path.lineTo(rp.com[0], rp.com[1]);
-                    }
+            Path2D.Double path = new Path2D.Double();
+            for (int x = 0; x < points[0].length; x ++) {
+                if (points[y][x] != null) {
+                    trans[y][x] = Rot.apply(points[y][x]);
+                    double zoom = 1 + trans[y][x].com[2] * PERSPECTIVE_Z_INFLUENCE;
+                    trans[y][x] = Trm.connect(GoMatrix.scale(zoom, zoom, 1)).apply(trans[y][x]);
+                    GoVector rp = trans[y][x];
+                    if (x == 0) path.moveTo(rp.com[0], rp.com[1]);
+                    else        path.lineTo(rp.com[0], rp.com[1]);
                 }
-                path.closePath();
-                paths[y] = path;
             }
+            path.closePath();
+            paths[y] = path;
         }
         GoVector a = trans[0][0].to(trans[0][1]);
         GoVector b = trans[0][0].to(trans[0][trans[0].length-1]);
@@ -133,6 +128,36 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
     
 
     private int stone = 0;
+
+    @Override
+    public void paint(Graphics2D g2, int l, GoPosAbstract hover) {
+        if (layer == l) {
+            boolean hovered = hover != null && hover.equals(pos);
+            stone = hovered ? hover.s : pos.s;
+
+            if (paths[0] != null) {
+                g2.setStroke(new BasicStroke(1.5f));
+                if (layer == 1) g2.setColor(Color.black); g2.draw(paths[0]);
+
+                g2.setColor(BASIC_FACE_COLOR.mix(LIGHT_COLOR, mixFac).toAWT());
+                g2.fill(paths[0]);
+
+                if (layer == 0) g2.setColor(Color.black); g2.draw(paths[0]);
+            }
+
+            //if (layer == 0) debugPaint(g2, hovered);
+
+            if (stone > 0 && paths[1] != null) {
+                GoColor color = STONE_COLORS[stone-1 + (hovered ? 2 : 0)].mix(LIGHT_COLOR, mixFac*0.3);
+                g2.setColor(color.toAWT()); g2.fill(paths[1]);
+            }
+            if (markcolor != null && paths[2] != null) {
+                g2.setColor(markcolor.mix(LIGHT_COLOR, mixFac*0.5).toAWT());
+                g2.setStroke(new BasicStroke(2));
+                g2.draw(paths[2]);
+            }
+        }
+    }
 
     private void debugPaint(Graphics2D g2, boolean hovered) {
         double size = 5.0;
@@ -149,34 +174,6 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
         g2.setColor(Color.green);
         g2.draw(new Line2D.Double(cx, cy, n.com[0], n.com[1]));
         g2.fill(new Ellipse2D.Double(n.com[0], n.com[1], size, size));*/
-    }
-
-    @Override
-    public void paint(Graphics2D g2, int l, GoPosAbstract hover) {
-        if (layer == l) {
-            boolean hovered = hover != null && hover.equals(pos);
-            stone = hovered ? hover.s : pos.s;
-
-            g2.setStroke(new BasicStroke(1.5f));
-            if (layer == 1) g2.setColor(Color.black); g2.draw(paths[0]);
-
-            g2.setColor(BASIC_FACE_COLOR.mix(LIGHT_COLOR, mixFac).toAWT());
-            g2.fill(paths[0]);
-
-            if (layer == 0) g2.setColor(Color.black); g2.draw(paths[0]);
-
-            if (layer == 0) debugPaint(g2, hovered);
-
-            if (stone > 0 && paths[1] != null) {
-                GoColor color = STONE_COLORS[stone-1 + (hovered ? 2 : 0)].mix(LIGHT_COLOR, mixFac*0.3);
-                g2.setColor(color.toAWT()); g2.fill(paths[1]);
-            }
-            if (markcolor != null && paths[2] != null) {
-                g2.setColor(markcolor.mix(LIGHT_COLOR, mixFac*0.5).toAWT());
-                g2.setStroke(new BasicStroke(2));
-                g2.draw(paths[2]);
-            }
-        }
     }
 
     @Override

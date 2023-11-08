@@ -117,6 +117,7 @@ public class GoGame {
     }
 
     public void closeUser(GoUser user) {
+        System.out.println("User " + user.name + " BYE!");
         GoUser other = null;
         if (players[0] == user) { players[0] = null; other = players[1]; }
         if (players[1] == user) { players[1] = null; other = players[0]; }

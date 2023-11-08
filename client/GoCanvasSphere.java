@@ -39,8 +39,6 @@ public class GoCanvasSphere extends GoCanvasAbstract {
             }
         }
 
-        //int strokeSize = state.n/2-1 + state.n;
-        //System.out.println("STROKE SIZE " + strokes.size() + " vs. " + strokeSize);
         if (strokes.size() != state.n/2 + state.n) {
             strokes.clear();
             for (int y = 1; y < state.n/2; y ++) 
@@ -50,24 +48,13 @@ public class GoCanvasSphere extends GoCanvasAbstract {
                 strokes.add(new GoCanvasSphereStroke(new int[]{1, x}, wlist));
         }
         
-        int pointsSize = (state.stones.length-2)*state.stones[1].length + 2;
-        //System.out.println("POINTS SIZE " + points.size() + " vs. " + pointsSize);
-        if (stones.size() != pointsSize) stones.clear();
         for (int y = 0; y < state.stones.length; y ++) {
             for (int x = 0; x < state.stones[y].length; x ++) {
                 GoPosAbstract pos = state.posOnMe(x, y);
-                if (stones.size() != pointsSize) {
-                    putStone(GoCanvasSpherePoint.canvasPointOnSphere(pos, state.colors[y][x], wlist));
-                }
-                else {
-                    for (GoCanvasStoneAbstract point : stones.values()) {
-                        if (point.getPos().equals(pos)) {
-                            point.setPos(pos);
-                            point.setColor(GoStateAbstract.color(state.colors[y][x]));
-                            break;
-                        }
-                    }
-                }
+                GoCanvasStoneAbstract stone = stones.get(pos.toString());
+
+                if (stone == null) putStone(GoCanvasSpherePoint.canvasPointOnSphere(pos, state.colors[y][x], wlist));
+                else stone.setPosColor(pos, GoStateAbstract.color(state.colors[y][x]));
             }
         }
 

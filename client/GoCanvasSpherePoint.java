@@ -74,8 +74,8 @@ public class GoCanvasSpherePoint implements GoCanvasStoneAbstract {
     }
 
     public GoPosAbstract getPos() { return pos; }
-    public void setPos(GoPosAbstract pos) { this.pos = pos; }
-    public void setColor(GoColor color) { this.color = color; }
+    
+    public void setPosColor(GoPosAbstract pos, GoColor color) { this.pos = pos; this.color = color; }
 
     private void updatePath(Path2D.Double path, GoVector[] circ, GoMatrix Trm) {
         for (int i = 0; i < circ.length; i ++) {
@@ -102,7 +102,7 @@ public class GoCanvasSpherePoint implements GoCanvasStoneAbstract {
     }
 
     public void paint(Graphics2D g2, int layer, GoPosAbstract hoverpos) { // layer: 0 = behind sphere, 1 = in front of sphere
-        boolean is_behind = renderedCenter.com[2] < 0;
+        boolean is_behind = renderedCenter != null && renderedCenter.com[2] < 0;
         if ((is_behind && layer == 0) || (!is_behind && layer == 1)) {
             boolean hovered = hoverpos != null && hoverpos.equals(pos);
             paintStone(g2, hovered ? hoverpos.s : pos.s, hovered);
@@ -110,7 +110,7 @@ public class GoCanvasSpherePoint implements GoCanvasStoneAbstract {
     }
 
     private void paintStone(Graphics2D g2, int stone, boolean hovered) {
-        if (stone > 0) {
+        if (stone > 0 && stoneCircle_path != null) {
             Color color = GoCanvasSpherePoint.STONE_COLORS[stone-1 + (hovered ? 2 : 0)];
             g2.setColor(color); g2.fill(stoneCircle_path);
 
@@ -119,7 +119,7 @@ public class GoCanvasSpherePoint implements GoCanvasStoneAbstract {
                 g2.setColor(Color.GRAY); g2.draw(stoneCircle_path);
             }
         }
-        if (color != null) {
+        if (color != null && markedCircle_path != null) {
             g2.setColor(color.toAWT());
             g2.setStroke(new BasicStroke(2));
             g2.draw(markedCircle_path);
@@ -127,6 +127,6 @@ public class GoCanvasSpherePoint implements GoCanvasStoneAbstract {
     }
 
     public boolean isHovered(double x, double y) {
-        return renderedCenter.com[2] > 0 && stoneCircle_path.contains(x, y);
+        return renderedCenter != null && renderedCenter.com[2] > 0 && stoneCircle_path.contains(x, y);
     }
 }

@@ -25,9 +25,8 @@ public class GoPosSphere extends GoPosAbstract {
         ArrayList<GoPosAbstract> neighbours = new ArrayList<GoPosAbstract>();
         if (y == 0 || y == n/2) {
             int ny = y == 0 ? 1 : n/2-1;
-            int[] circles = state.stones[ny];
-            for (int nx = 0; nx < circles.length; nx ++) {
-                neighbours.add(state.posOnMe(nx, n));
+            for (int nx = 0; nx < state.stones[ny].length; nx ++) {
+                neighbours.add(state.posOnMe(nx, ny));
             }
         }
         else {

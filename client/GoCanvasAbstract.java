@@ -10,6 +10,7 @@ import math.GoVector;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 public abstract class GoCanvasAbstract extends JPanel implements ActionListener, MouseMotionListener, MouseListener, MouseWheelListener {
@@ -35,7 +36,7 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
     protected GoMatrix Tsl;
     protected GoMatrix Trm;
 
-    protected TreeMap<String, GoCanvasStoneAbstract> stones = new TreeMap<>();
+    protected HashMap<String, GoCanvasStoneAbstract> stones = new HashMap<>();
     public void putStone(GoCanvasStoneAbstract stone) {
         stones.put(stone.getPos().posString(), stone);
     }
@@ -55,6 +56,7 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         updateMe();
+        
         Graphics2D g2 = (Graphics2D) g;
         /*
         g2.setRenderingHint(
@@ -109,7 +111,9 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
         boolean delete = state.status == GoStateAbstract.DELETE_STATUS;
         if (running || delete) {
             for (GoCanvasStoneAbstract point : stones.values()) {
-                if (point.getPos().s == 0 && point.isHovered(e.getX(), e.getY())) {
+                boolean running_ok = state.status == GoStateAbstract.RUNNING_STATUS && point.getPos().s == 0;
+                boolean delete_ok  = state.status == GoStateAbstract.DELETE_STATUS  && point.getPos().s != 0;
+                if ((running_ok || delete_ok) && point.isHovered(e.getX(), e.getY())) {
                     hover_pos = point.getPos().changeStone(state.me+1);
                     break;
                 }

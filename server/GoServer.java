@@ -46,9 +46,11 @@ public class GoServer implements Runnable {
 
     public String createNewGame(GoConfig conf, GoUser user) {
         int id = conf.preferred_id >= 0 ? conf.preferred_id : newID();
-        boolean sphere_notok = conf.object == GoConfig.SPHERE_OBJECT && conf.n < 4 || conf.n > 40 || conf.n % 4 != 0;
-        boolean cube_notok   = conf.object == GoConfig.CUBE_OBJECT   && conf.n < 3 || conf.n > 20;
+        System.out.println("preferred id " + conf.preferred_id + "  id "+id);
+        boolean sphere_notok = conf.object == GoConfig.SPHERE_OBJECT && (conf.n < 4 || conf.n > 40 || conf.n % 4 != 0);
+        boolean cube_notok   = conf.object == GoConfig.CUBE_OBJECT   && (conf.n < 3 || conf.n > 20);
         if (used_ids.contains(id)) return "The preferred ID " + id + " is in use.";
+        else if (conf.object != GoConfig.CUBE_OBJECT && conf.object != GoConfig.SPHERE_OBJECT) return "The object must be either <0> or <1>.";
         else if (sphere_notok) return "The Size must be beween 0 and 40 and it must be divisible by 4.";
         else if (cube_notok)   return "The Size must be beween 3 and 20.";
         else if (conf.first_color > 1) return "The color must be either 0 (black) or 1 (white).";
