@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import data.GoConfig;
 import data.GoJoin;
+import data.GoVersion;
 
 public class GoServer implements Runnable {
     public static final int MAX_ID = 9999;
@@ -65,7 +66,7 @@ public class GoServer implements Runnable {
     } 
 
     public void run() {
-        System.out.println("Server listening on port " + port + (DEBUG ? " in DEBUG mode" : "") + "...");
+        System.out.println("GoServer (Version V"+GoVersion.version+") listening on port " + port + (DEBUG ? " in DEBUG mode" : "") + "...");
         while (!exit) {
             try {
                 Socket socket = serverSocket.accept();

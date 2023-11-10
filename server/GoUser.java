@@ -1,11 +1,18 @@
 package server;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.file.Files;
 
 import data.GoConfig;
 import data.GoJoin;
 import data.GoMove;
+import data.GoVersion;
 import network.GoSocket;
 
 public class GoUser extends GoSocket {
@@ -16,6 +23,7 @@ public class GoUser extends GoSocket {
     public GoUser(Socket socket, GoServer server) throws IOException {
         super(socket);
         this.server = server;
+        send("VRS"+GoVersion.version);
     }
 
     public void onMessage(Object message) {
@@ -67,9 +75,26 @@ public class GoUser extends GoSocket {
                     }
                 }
             }
+            if (sub.equals("CHT")) {
+                if (game != null) {
+                    game.chatMessage(name+": "+con);
+                }
+            }
             if (sub.equals("BYE")) {
                 if (game != null) game.closeUser(this);
             }
+            if (sub.equals("UPG")) upgradeClient();
         }
+    }
+
+    public void upgradeClient() {
+        System.out.println("Updating client...");
+        File jar = new File(GoVersion.jarFile);
+        try {
+            byte[] content = Files.readAllBytes(jar.toPath());
+            send(content);
+        }
+        catch (FileNotFoundException ex) { send("ERRCould not find jar file."); }
+        catch (IOException ex) { send("ERRIOException while reading jar."); }
     }
 }

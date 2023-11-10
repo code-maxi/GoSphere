@@ -1,6 +1,7 @@
 package client;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 import data.GoMove;
 import data.GoPosAbstract;
@@ -10,13 +11,15 @@ import math.GoVector;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.TreeMap;
 
-public abstract class GoCanvasAbstract extends JPanel implements ActionListener, MouseMotionListener, MouseListener, MouseWheelListener {
+public abstract class GoCanvasAbstract extends JPanel implements ActionListener, MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
     public static final double SCROLL_FAC = 0.05;
     public static final double DRAG_FAC = 0.005;
     public static final double MAX_MOUSEMOVE = 5;
+    public static final int CHAT_MESSAGE_DELAY = 25000;
+    public static final float CHAT_MESSAGE_FS = 18f;
 
     private final GoViewer viewer;
 
@@ -36,6 +39,9 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
     protected GoMatrix Tsl;
     protected GoMatrix Trm;
 
+    private final JTextField chatField;
+    private final ArrayList<String> chatMessages = new ArrayList<>();
+
     protected HashMap<String, GoCanvasStoneAbstract> stones = new HashMap<>();
     public void putStone(GoCanvasStoneAbstract stone) {
         stones.put(stone.getPos().posString(), stone);
@@ -47,30 +53,65 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
+
+        setLayout(new BorderLayout());
+        JPanel chatPanel = new JPanel();
+        chatField = new JTextField(30);
+        chatField.setBorder(new EmptyBorder(new Insets(8, 8, 8, 8)));
+        chatField.setFont(getFont().deriveFont(15f));
+        chatField.setMargin(new Insets(0, 0, 10, 0));
+        chatField.setVisible(false);
+        chatField.addKeyListener(this);
+        chatPanel.add(chatField);
+        add(chatPanel, BorderLayout.SOUTH);
     }
 
     public abstract void setState(GoStateAbstract state);
     public abstract void paintMe(Graphics2D g2);
 
+    public synchronized void showChatField() {
+        chatField.setVisible(true);
+        chatField.setText("Write your message here (press <ENTER> to send)... ");
+        chatField.select(0, chatField.getText().length());
+        chatField.requestFocus();
+        viewer.validate();
+    }
+
+    private void sendChatMessage(boolean send) {
+        if (send && !chatField.getText().equals("")) viewer.chatMessage(chatField.getText());
+        chatField.setVisible(false);
+        viewer.requestFocus();
+    }
+
+    public void chatMessage(String text) {
+        chatMessages.add(text);
+        repaint();
+        new Thread(new Runnable() {
+            public void run() {
+                try { Thread.sleep(CHAT_MESSAGE_DELAY); }
+                catch (InterruptedException ex) {}
+                chatMessages.remove(text);
+                repaint();
+            }
+        }).start();
+    }
+
+    private void paintChat(Graphics2D g2) {
+        g2.setColor(Color.gray);
+        g2.setFont(g2.getFont().deriveFont(CHAT_MESSAGE_FS));
+        for (int i = 0; i < chatMessages.size(); i ++) {
+            g2.drawString(chatMessages.get(i), 30, 30+CHAT_MESSAGE_FS*1.5f*i);
+        }
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         updateMe();
-        
         Graphics2D g2 = (Graphics2D) g;
-        /*
-        g2.setRenderingHint(
-            RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(
-            RenderingHints.KEY_TEXT_ANTIALIASING,
-            RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2.setRenderingHint(
-            RenderingHints.KEY_FRACTIONALMETRICS,
-            RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-        */
+        paintChat(g2);
         paintMe(g2);
-    }  
+    }
 
     // fitting object's size and position to window geometry
     protected synchronized void updateMe() {
@@ -155,4 +196,12 @@ public abstract class GoCanvasAbstract extends JPanel implements ActionListener,
         scale_state += e.getWheelRotation() * GoCanvasSphere.SCROLL_FAC * scale_state;
         repaint();
     }
+
+    public void keyTyped(KeyEvent var1) {}
+    public void keyPressed(KeyEvent var1) {
+        if (var1.getKeyCode() == KeyEvent.VK_ESCAPE) sendChatMessage(false);
+        if (var1.getKeyCode() == KeyEvent.VK_ENTER) sendChatMessage(true);
+    };
+
+    public void keyReleased(KeyEvent var1) {}
 }

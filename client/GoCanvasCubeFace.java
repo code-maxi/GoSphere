@@ -19,7 +19,7 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
     public static final double STONE_POINTS_FAC = 0.7;
     public static final double MARK_POINTS_FAC = 0.4;
     
-    public static final GoColor BASIC_FACE_COLOR = new GoColor(0.3, 0.3, 0.3, 0.85);
+    public static final GoColor BASIC_FACE_COLOR = new GoColor(0.35, 0.35, 0.35, 0.925);
 
     public static final GoColor LIGHT_COLOR = new GoColor(1, 1, 1, 0.5);
 
@@ -30,7 +30,7 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
         new GoColor(1, 1, 1, 0.4)
     };
 
-    public static final double MAX_LIGHT_MIX = 0.5;
+    public static final double MAX_LIGHT_MIX = 0.7;
 
     public static final GoVector PERSPECTIVE_UNIT_VECTOR = new GoVector(0, 0, 1);
 
@@ -80,7 +80,7 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
     public GoColor markcolor;
 
     public GoVector[][] points = new GoVector[4][4];
-    public GoVector[][] trans = new GoVector[4][4];
+    public GoVector[][] rend = new GoVector[4][4];
     public Path2D.Double[] paths = new Path2D.Double[4];
 
     public GoCanvasCubeFace(GoVector[][] cornerPoints, GoPosAbstract pos, int color) {
@@ -107,10 +107,10 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
             Path2D.Double path = new Path2D.Double();
             for (int x = 0; x < points[0].length; x ++) {
                 if (points[y][x] != null) {
-                    trans[y][x] = Rot.apply(points[y][x]);
-                    double zoom = 1 + trans[y][x].com[2] * PERSPECTIVE_Z_INFLUENCE;
-                    trans[y][x] = Trm.connect(GoMatrix.scale(zoom, zoom, 1)).apply(trans[y][x]);
-                    GoVector rp = trans[y][x];
+                    rend[y][x] = Rot.apply(points[y][x]);
+                    double zoom = 1 + rend[y][x].com[2] * PERSPECTIVE_Z_INFLUENCE;
+                    rend[y][x] = Trm.connect(GoMatrix.scale(zoom, zoom, 1)).apply(rend[y][x]);
+                    GoVector rp = rend[y][x];
                     if (x == 0) path.moveTo(rp.com[0], rp.com[1]);
                     else        path.lineTo(rp.com[0], rp.com[1]);
                 }
@@ -118,8 +118,8 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
             path.closePath();
             paths[y] = path;
         }
-        GoVector a = trans[0][0].to(trans[0][1]);
-        GoVector b = trans[0][0].to(trans[0][trans[0].length-1]);
+        GoVector a = rend[0][0].to(rend[0][1]);
+        GoVector b = rend[0][0].to(rend[0][rend[0].length-1]);
         GoVector n = b.crossProduct(a).unit();
         angle = PERSPECTIVE_UNIT_VECTOR.angle(n);
         layer = (int)(angle/Math.PI*2);
@@ -136,13 +136,31 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
             stone = hovered ? hover.s : pos.s;
 
             if (paths[0] != null) {
-                g2.setStroke(new BasicStroke(1.5f));
-                if (layer == 1) g2.setColor(Color.black); g2.draw(paths[0]);
+                GoVector a1 = rend[0][0].add(rend[0][1]).mul(0.5);
+                GoVector a2 = rend[0][3].add(rend[0][2]).mul(0.5);
+                GoVector b1 = rend[0][0].add(rend[0][3]).mul(0.5);
+                GoVector b2 = rend[0][1].add(rend[0][2]).mul(0.5);
+                Path2D.Double grid = new Path2D.Double();
+                grid.moveTo(a1.com[0], a1.com[1]);
+                grid.lineTo(a2.com[0], a2.com[1]);
+                grid.moveTo(b1.com[0], b1.com[1]);
+                grid.lineTo(b2.com[0], b2.com[1]);
 
-                g2.setColor(BASIC_FACE_COLOR.mix(LIGHT_COLOR, mixFac).toAWT());
-                g2.fill(paths[0]);
+                for (int i = 0; i < 2; i ++) {
+                    if ((i + (layer == 1 ? 1 : 0)) % 2 == 0) {
+                        g2.setColor(BASIC_FACE_COLOR.mix(LIGHT_COLOR, mixFac).toAWT());
+                        g2.fill(paths[0]);
+                    }
+                    else {
+                        /*g2.setStroke(new BasicStroke(1f));
+                        g2.setColor(Color.gray); 
+                        g2.draw(paths[0]);*/
 
-                if (layer == 0) g2.setColor(Color.black); g2.draw(paths[0]);
+                        g2.setStroke(new BasicStroke(1.5f));
+                        g2.setColor(Color.black); 
+                        g2.draw(grid);
+                    }
+                }
             }
 
             //if (layer == 0) debugPaint(g2, hovered);
@@ -162,8 +180,8 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
     private void debugPaint(Graphics2D g2, boolean hovered) {
         double size = 5.0;
         g2.setColor(Color.ORANGE);
-        int cx = (int)trans[3][0].com[0];
-        int cy = (int)trans[3][0].com[1];
+        int cx = (int)rend[3][0].com[0];
+        int cy = (int)rend[3][0].com[1];
         g2.fill(new Ellipse2D.Double(cx, cy, size, size));
         g2.setColor(layer == 0 ? Color.orange : Color.red);
         g2.drawString((pos.x/pos.n)+" "+pos, cx, cy);
@@ -178,6 +196,6 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
 
     @Override
     public boolean isHovered(double x, double y) {
-        return layer == 0 && paths[0].contains(x, y);
+        return paths[0] != null && layer == 0 && paths[0].contains(x, y);
     }
 }

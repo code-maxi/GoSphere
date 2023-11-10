@@ -1,0 +1,16 @@
+body {
+    background-image: url('image.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed; 
+    background-size: contain;
+    display: flexbox;
+}
+#box {
+    background-color: blue;
+    padding: 20px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 10px 10px 0 0 rgba(0,0,0,0.3);
+    bottom: 0;
+    left: 50%;
+}

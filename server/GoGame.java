@@ -89,6 +89,12 @@ public class GoGame {
         return result;
     }
 
+    public void chatMessage(String text) {
+        for (GoUser user : players) {
+            if (user != null) user.send("CHT"+text);
+        }
+    }
+
     public void changeTurns() {
         state = state.copy(state.me, (state.turn + 1) % 2, state.status);
     }

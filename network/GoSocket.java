@@ -6,9 +6,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public abstract class GoSocket implements Runnable {
-    private Socket socket;
-    private ObjectInputStream input;
-    private ObjectOutputStream output;
+    protected Socket socket;
+    protected ObjectInputStream input;
+    protected ObjectOutputStream output;
     public boolean exit = false;
 
     public GoSocket(Socket socket) throws IOException {
