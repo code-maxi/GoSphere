@@ -14,6 +14,7 @@ import data.GoVersion;
 public class GoConsole implements Runnable {
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_BOLD = "\u001B[1m";
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_YELLOW = "\u001B[33m";
@@ -41,10 +42,17 @@ public class GoConsole implements Runnable {
     public void run() {
         reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("");
-        System.out.println(ANSI_BLUE+"Welcome to Go3D (Version "+ANSI_RED+"V"+GoVersion.version+ANSI_BLUE+")! "+ANSI_RESET);
-        System.out.println("Go3D is a program with which you can play the board game Go in a completely different way, namely three-dimensionally.");
-        System.out.println("Now, you first have to connect to a server by entering the corresponding URL with the corresponding port.");
-        System.out.println("You can use the public server yoda.li with the port 5555. Have fun!");
+        System.out.println(ANSI_BLUE+ANSI_BOLD+"Welcome to Go3D (Version V"+GoVersion.version+")!"+ANSI_RESET);
+        System.out.println();
+        System.out.println(ANSI_BLUE+"Go3D is a program with which you can play the board game Go in a completely different way, namely three-dimensionally."+ANSI_RESET);
+        System.out.println();
+        System.out.print("Now, you first have to connect to a server by entering the corresponding URL with the corresponding port. ");
+        System.out.println("You can use the public server "+ANSI_BOLD+ANSI_BLUE+"yoda.li"+ANSI_RESET+" with the port "+ANSI_BLUE+ANSI_BOLD+"5555"+ANSI_RESET+".");
+        System.out.println();
+        System.out.println("By the way, if you want to host your own server you should run...");
+        System.out.println(ANSI_BOLD+"   > java -cp Go3D.jar server.GoServer <port?> &"+ANSI_RESET);
+        System.out.println();
+        System.out.println(ANSI_BLUE+ANSI_BOLD+"Have fun!"+ANSI_RESET);
         System.out.println("______________");
         
 
@@ -53,8 +61,8 @@ public class GoConsole implements Runnable {
                 String host = args.length > 0 ? args[0] : null;
                 Object port = args.length > 1 ? Integer.parseInt(args[1]) : null;
 
-                promts.put("server", new GoPromt("server", "Enter the server host you want to connect to.", GoPromt.STR, null, host));
-                promts.put("port",   new GoPromt("port", "Enter the server port.", GoPromt.INT, null, port));
+                promts.put("server", new GoPromt("server", "Enter the server you want to connect to.", GoPromt.STR, null, host));
+                promts.put("port",   new GoPromt("port", "Enter the port.", GoPromt.INT, null, port));
                 GoPromt.promt(promts, reader, prmtstr);
 
                 client = new GoClient(
@@ -73,28 +81,28 @@ public class GoConsole implements Runnable {
         prmtstr = client.connection + "(V"+client.serverVersion+")";
 
         boolean upgrading = false;
-        if (client.serverVersion != GoVersion.version) {
+        if (client.serverVersion > GoVersion.version) {
             promts.put("upgrade", new GoPromt("upgrade", "You seem to have an older version (V"+GoVersion.version+") than the server (V"+client.serverVersion+"). Do you want to upgrade (<1>) or not (<0>)?", GoPromt.INT, null, null));
             GoPromt.promt(promts, reader, prmtstr);
             if ((int)promts.get("upgrade").value == 1) {
-                System.out.println("Trying to update...");
+                System.out.println("Trying to upgrade...");
                 client.send("UPG");
                 upgrading = true;
             }
         }
 
         if (!upgrading) {    
-            while (promts.get("cjgame") == null || promts.get("cjgame").value.equals("L")) {
-                promts.put("cjgame", new GoPromt("cjgame", "Do you want to create <C> or join <J> a game or list all aviable games <L>?", GoPromt.STR, "[CJL]", args.length > 2 ? args[2] : null));
-                GoPromt.promt(promts, reader, prmtstr);
-                if (promts.get("cjgame").value.equals("L")) {
-                    client.send("LST");
-                    sleep(500);
-                }
-            }
-
             while (client.state == null) {
-                if (promts.get("cjgame").value.equals("C")) {
+                promts.put("cjgame", new GoPromt("cjgame", "Do you want to create <C> or join <J> a game or list all aviable games <L> or exit the program <E>?", GoPromt.STR, "[CJLE]", args.length > 2 ? args[2] : null));
+                GoPromt.promt(promts, reader, prmtstr);
+                if (((String)promts.get("cjgame").value).toUpperCase().equals("L")) {
+                    client.send("LST");
+                }
+                else if (((String)promts.get("cjgame").value).toUpperCase().equals("E")) {
+                    client.close();
+                    System.exit(0);
+                }
+                else if (((String)promts.get("cjgame").value).toUpperCase().equals("C")) {
                     promts.put("creator_name", new GoPromt("creator_name", "CREATE GAME: What's your name?", GoPromt.STR, NAMEPATTERN, args.length > 3 ? args[3] : null));
                     promts.put("object",       new GoPromt("object", "CREATE GAME: Do you want to play on a sphere or on a cube? (sphere <"+GoConfig.SPHERE_OBJECT+">, cube <"+GoConfig.CUBE_OBJECT+">)?", GoPromt.INT, null, args.length > 4 ? Integer.parseInt(args[4]) : null));
                     promts.put("n",            new GoPromt("n", "CREATE GAME: Enter the size of the game.", GoPromt.INT, null, args.length > 5 ? Integer.parseInt(args[5]) : null));

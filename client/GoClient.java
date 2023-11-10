@@ -1,9 +1,7 @@
 package client;
-import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.util.ArrayList;
 
 import data.*;
 import network.GoSocket;
@@ -29,10 +27,7 @@ public class GoClient extends GoSocket {
             if (sub.equals("INF")) System.out.println(GoConsole.ANSI_BLUE + "\nSERVER INFO: " + con + GoConsole.ANSI_RESET);
             if (sub.equals("GUI") && viewer != null) viewer.labels.showError(con); 
             if (sub.equals("CHT") && viewer != null) viewer.canvas.chatMessage(con);
-            if (sub.equals("VRS")) {
-                System.out.println("SERVERVERSION: "+con);
-                serverVersion = Integer.parseInt(con);
-            }
+            if (sub.equals("VRS")) { serverVersion = Integer.parseInt(con); }
         }
         if (message instanceof GoStateAbstract) {
             state = (GoStateAbstract) message;
@@ -40,10 +35,10 @@ public class GoClient extends GoSocket {
             else viewer.setState(state);
         }
         if (message instanceof byte[]) {
-            File jar = new File(GoVersion.jarFile);
             try {
-                Files.write(jar.toPath(), (byte[])message);
+                Files.write(GoVersion.jarFile, (byte[])message);
                 System.out.println("Go3D has been ugraded now. You can restart the program.");
+                close();
                 System.exit(0);
             }
             catch (IOException ex) { ex.printStackTrace(); }

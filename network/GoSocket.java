@@ -21,13 +21,14 @@ public abstract class GoSocket implements Runnable {
         catch (Exception ex) { }
     }
 
+    protected void oninit() {}
+
     public void run() {
         try {
-            output = new ObjectOutputStream(socket.getOutputStream());
-            output.flush();
-            input = new ObjectInputStream(socket.getInputStream());
+            output = new ObjectOutputStream(socket.getOutputStream()); output.flush();
+            input  = new ObjectInputStream(socket.getInputStream());
+            oninit();
             
-            //System.out.println("Socket listening...");
             while (!exit && !socket.isClosed()) {
                 try {
                     Object message = input.readObject();
@@ -51,7 +52,7 @@ public abstract class GoSocket implements Runnable {
             socket.close();
         }
         catch (IOException exc) { exc.printStackTrace(); }
-        System.out.println("Socket closed.");
+        //System.out.println("Socket closed.");
     }
 
     public void close() { close(true); }

@@ -123,7 +123,6 @@ public class GoGame {
     }
 
     public void closeUser(GoUser user) {
-        System.out.println("User " + user.name + " BYE!");
         GoUser other = null;
         if (players[0] == user) { players[0] = null; other = players[1]; }
         if (players[1] == user) { players[1] = null; other = players[0]; }
@@ -134,6 +133,7 @@ public class GoGame {
             server.games.remove(state.id);
             System.out.println("Go Game " + state.id + " was closed.");
         }
+        System.out.println("User " + user.name + " was closed.");
     }
 
     public void setStatus(int status) {

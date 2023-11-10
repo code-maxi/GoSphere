@@ -1,11 +1,7 @@
 package server;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.file.Files;
 
@@ -23,8 +19,10 @@ public class GoUser extends GoSocket {
     public GoUser(Socket socket, GoServer server) throws IOException {
         super(socket);
         this.server = server;
-        send("VRS"+GoVersion.version);
     }
+
+    @Override
+    public void oninit() { send("VRS"+GoVersion.version); }
 
     public void onMessage(Object message) {
         if (server.DEBUG) System.out.println("User " + name + " recieved " + message);
@@ -70,9 +68,7 @@ public class GoUser extends GoSocket {
                         String error = game.playerNext(me);
                         if (error != null) send("GUI" + error);
                     }
-                    catch(NumberFormatException ex) {
-                        send("ERRCould not read id '"+con+"'.");
-                    }
+                    catch(NumberFormatException ex) { send("ERRCould not read id '"+con+"'."); }
                 }
             }
             if (sub.equals("CHT")) {
@@ -89,9 +85,8 @@ public class GoUser extends GoSocket {
 
     public void upgradeClient() {
         System.out.println("Updating client...");
-        File jar = new File(GoVersion.jarFile);
         try {
-            byte[] content = Files.readAllBytes(jar.toPath());
+            byte[] content = Files.readAllBytes(GoVersion.jarFile);
             send(content);
         }
         catch (FileNotFoundException ex) { send("ERRCould not find jar file."); }

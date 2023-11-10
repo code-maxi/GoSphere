@@ -70,8 +70,8 @@ public class GoServer implements Runnable {
         while (!exit) {
             try {
                 Socket socket = serverSocket.accept();
-                System.out.println("GoUser accepted.");
                 new GoUser(socket, this);
+                System.out.println("GoUser accepted.");
             }
             catch (Exception e) { e.printStackTrace(); }
         }
