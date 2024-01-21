@@ -97,12 +97,10 @@ public class GoServer implements Runnable {
         return res;
     }
 
-    public static void main(String[] args) {
-        try {
-            int port = args.length > 0 ? Integer.parseInt(args[0]) : 5555;
-            String name = args.length > 1 ? args[1] : "";
-            boolean debug = args.length > 2 && args[2].equals("DEBUG");
-            new GoServer(port, debug, name);
-        }
+    public static void main(String[] args) throws IOException {
+        int port = args.length > 0 ? Integer.parseInt(args[0]) : 5555;
+        String name = args.length > 1 ? args[1] : "";
+        boolean debug = args.length > 2 && args[2].equals("DEBUG");
+        new GoServer(port, debug, name);
     }
 }

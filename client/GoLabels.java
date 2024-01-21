@@ -17,15 +17,14 @@ public class GoLabels extends JPanel implements Runnable {
             BorderFactory.createLineBorder(Color.BLACK, 2, true),
             BorderFactory.createLineBorder(Color.WHITE, 0, true)
     };
+    public static final float SCALE_FAC = (float) Toolkit.getDefaultToolkit().getScreenSize().width / 1920f;
     public static final int ERROR_DELAY = 5000;
 
     static {
-        float factor = (float) Toolkit.getDefaultToolkit().getScreenSize().width / 1920f;
-
         LABEL_FONTS = new Font[] {
-                new Font(Font.MONOSPACED, Font.BOLD, (int) (20f * factor)),
-                new Font(Font.MONOSPACED, Font.PLAIN, (int) (20f * factor)),
-                new Font(Font.SANS_SERIF, Font.PLAIN, (int) (16f * factor))
+                new Font(Font.MONOSPACED, Font.BOLD, (int) (20f * SCALE_FAC)),
+                new Font(Font.MONOSPACED, Font.PLAIN, (int) (20f * SCALE_FAC)),
+                new Font(Font.SANS_SERIF, Font.PLAIN, (int) (16f * SCALE_FAC))
         };
     }
 
@@ -35,12 +34,16 @@ public class GoLabels extends JPanel implements Runnable {
 
     public GoLabels(GoStateAbstract state) {
         super(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        setBorder(BorderFactory.createEmptyBorder(
+                (int) (GoLabels.SCALE_FAC * 10),
+                (int) (GoLabels.SCALE_FAC * 20),
+                (int) (GoLabels.SCALE_FAC * 10),
+                (int) (GoLabels.SCALE_FAC * 20)));
         labels[0].setForeground(Color.BLACK);
         labels[1].setForeground(Color.GRAY);
         info_label = new JLabel("");
         info_label.setFont(LABEL_FONTS[2]);
-        info_label.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+        info_label.setBorder(BorderFactory.createEmptyBorder((int) (GoLabels.SCALE_FAC * 10), 0, 0, 0));
 
         add(labels[0], BorderLayout.WEST);
         add(labels[1], BorderLayout.EAST);

@@ -61,7 +61,7 @@ public abstract class GoCanvasAbstract extends JPanel
         JPanel chatPanel = new JPanel();
         chatField = new JTextField(30);
         chatField.setBorder(new EmptyBorder(new Insets(8, 8, 8, 8)));
-        chatField.setFont(getFont().deriveFont(15f));
+        chatField.setFont(getFont().deriveFont(15f * GoLabels.SCALE_FAC));
         chatField.setMargin(new Insets(0, 0, 10, 0));
         chatField.setVisible(false);
         chatField.addKeyListener(this);
@@ -105,9 +105,10 @@ public abstract class GoCanvasAbstract extends JPanel
 
     private void paintChat(Graphics2D g2) {
         g2.setColor(Color.gray);
-        g2.setFont(g2.getFont().deriveFont(CHAT_MESSAGE_FS));
+        g2.setFont(g2.getFont().deriveFont(CHAT_MESSAGE_FS * GoLabels.SCALE_FAC));
         for (int i = 0; i < chatMessages.size(); i++) {
-            g2.drawString(chatMessages.get(i), 30, 30 + CHAT_MESSAGE_FS * 1.5f * i);
+            g2.drawString(chatMessages.get(i), (int) (GoLabels.SCALE_FAC * 30),
+                    (int) (GoLabels.SCALE_FAC * (30 + CHAT_MESSAGE_FS * 1.5f * i)));
         }
     }
 

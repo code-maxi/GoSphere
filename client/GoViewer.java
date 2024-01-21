@@ -29,6 +29,8 @@ public class GoViewer extends JFrame implements KeyListener, WindowListener {
         add(labels, BorderLayout.NORTH);
         add(canvas, BorderLayout.CENTER);
 
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/res/icon.png")));
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         addKeyListener(this);
         addWindowListener(this);
