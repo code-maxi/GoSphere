@@ -25,8 +25,8 @@ public class GoCanvasCube extends GoCanvasAbstract {
 
     @Override
     public void paintMe(Graphics2D g2) {
-        for (GoCanvasStoneAbstract s : stones.values()) { s.paint(g2, 1, hover_pos); }
-        for (GoCanvasStoneAbstract s : stones.values()) { s.paint(g2, 0, hover_pos); }
+        for (GoCanvasStoneAbstract s : stones.values()) { s.paint(g2, 1, hover_pos_paint); }
+        for (GoCanvasStoneAbstract s : stones.values()) { s.paint(g2, 0, hover_pos_paint); }
 
         /*double size = 10;
         g2.setColor(Color.ORANGE);

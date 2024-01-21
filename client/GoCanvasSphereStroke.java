@@ -44,8 +44,10 @@ public class GoCanvasSphereStroke {
     }
 
     public void paint(Graphics2D g2, int layer) {
-        g2.setStroke(new BasicStroke(2));
-        g2.setPaint(Color.BLACK);
-        g2.draw(circle_path[layer]);
+        if (circle_path != null && circle_path[layer] != null) {
+            g2.setStroke(new BasicStroke(2));
+            g2.setPaint(Color.BLACK);
+            g2.draw(circle_path[layer]);
+        }
     }
 }

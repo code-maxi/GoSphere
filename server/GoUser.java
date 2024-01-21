@@ -22,7 +22,7 @@ public class GoUser extends GoSocket {
     }
 
     @Override
-    public void oninit() { send("VRS"+GoVersion.version); }
+    public void oninit() { send("VRS"+GoVersion.version+"@"+server.name); }
 
     public void onMessage(Object message) {
         if (server.DEBUG) System.out.println("User " + name + " recieved " + message);

@@ -25,7 +25,7 @@ public abstract class GoStateAbstract implements Serializable {
         if (c == WHITE) res = new Color(220, 220, 220, 255);
         if (c == RED) res = Color.RED;
         if (c == BLUE) res = Color.BLUE;
-        if (c == GREEN) res = Color.GREEN;
+        if (c == GREEN) res = new Color(0,200,0);
         return res != null ? GoColor.convertAWT(res) : null;
     }
 
@@ -50,6 +50,7 @@ public abstract class GoStateAbstract implements Serializable {
             else if (this.status == DELETE_STATUS) header = "DELETE STATE: The game has ended. Please delete all dead stones by marking them and pressing <Space> to finish.";
             else if (this.status == END_STATUS) header = "END STATE: The stones have been deleted and the game is finished. You can start aq rematch by pressing <Space>.";
         }
+        header += " Chat by pressing <C>.";
         return header;
     }
 

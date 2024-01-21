@@ -8,13 +8,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import data.GoStateSphere;
 import data.GoStateAbstract;
 
 public class GoLabels extends JPanel implements Runnable {
     public static final Font[] LABEL_FONTS = {
-        new Font(Font.MONOSPACED, Font.BOLD, 17),
-        new Font(Font.MONOSPACED, Font.PLAIN, 17)
+        new Font(Font.MONOSPACED, Font.BOLD, 18),
+        new Font(Font.MONOSPACED, Font.PLAIN, 18)
     };
     public static final Border[] LABEL_BORDERS = {
         BorderFactory.createLineBorder(Color.BLACK, 2, true),

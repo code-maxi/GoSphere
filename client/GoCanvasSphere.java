@@ -95,8 +95,8 @@ public class GoCanvasSphere extends GoCanvasAbstract {
 
     @Override
     public void paintMe(Graphics2D g2) {
-        for (GoCanvasStoneAbstract p : stones.values()) { p.paint(g2, 0, hover_pos); }
+        for (GoCanvasStoneAbstract p : stones.values()) { p.paint(g2, 0, hover_pos_paint); }
         paintSphere(g2);
-        for (GoCanvasStoneAbstract p : stones.values()) { p.paint(g2, 1, hover_pos); }
+        for (GoCanvasStoneAbstract p : stones.values()) { p.paint(g2, 1, hover_pos_paint); }
     }
 }

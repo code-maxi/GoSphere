@@ -22,7 +22,7 @@ public class GoConsole implements Runnable {
     public static final String ANSI_PURPLE = "\u001B[35m";
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
-    public static final String NAMEPATTERN = "\\w{3,20}";;
+    public static final String NAMEPATTERN = "\\w{3,20}";
 
     private GoClient client = null;
     private HashMap<String, GoPromt> promts = new HashMap<String, GoPromt>();
@@ -47,9 +47,9 @@ public class GoConsole implements Runnable {
         System.out.println(ANSI_BLUE+"Go3D is a program with which you can play the board game Go in a completely different way, namely three-dimensionally."+ANSI_RESET);
         System.out.println();
         System.out.print("Now, you first have to connect to a server by entering the corresponding URL with the corresponding port. ");
-        System.out.println("You can use the public server "+ANSI_BOLD+ANSI_BLUE+"yoda.li"+ANSI_RESET+" with the port "+ANSI_BLUE+ANSI_BOLD+"5555"+ANSI_RESET+".");
+        System.out.println("You can use the public server "+ANSI_BOLD+ANSI_BLUE+"maxi.li"+ANSI_RESET+" with the port "+ANSI_BLUE+ANSI_BOLD+"5556"+ANSI_RESET+".");
         System.out.println();
-        System.out.println("By the way, if you want to host your own server you should run...");
+        System.out.println("By the way, if you want to host your own server, you should run...");
         System.out.println(ANSI_BOLD+"   > java -cp Go3D.jar server.GoServer <port?> &"+ANSI_RESET);
         System.out.println();
         System.out.println(ANSI_BLUE+ANSI_BOLD+"Have fun!"+ANSI_RESET);
@@ -78,7 +78,7 @@ public class GoConsole implements Runnable {
 
         sleep(500);
 
-        prmtstr = client.connection + "(V"+client.serverVersion+")";
+        prmtstr = client.connection + (!client.serverName.equals("") ? " @"+client.serverName : "") + " (V"+client.serverVersion+")";
 
         boolean upgrading = false;
         if (client.serverVersion > GoVersion.version) {
@@ -93,7 +93,7 @@ public class GoConsole implements Runnable {
 
         if (!upgrading) {    
             while (client.state == null) {
-                promts.put("cjgame", new GoPromt("cjgame", "Do you want to create <C> or join <J> a game or list all aviable games <L> or exit the program <E>?", GoPromt.STR, "[CJLE]", args.length > 2 ? args[2] : null));
+                promts.put("cjgame", new GoPromt("cjgame", "Do you want to create <C> or join <J> a game or list all aviable games <L> or exit the program <E>?", GoPromt.STR, "[CJLEcjle]", args.length > 2 ? args[2] : null));
                 GoPromt.promt(promts, reader, prmtstr);
                 if (((String)promts.get("cjgame").value).toUpperCase().equals("L")) {
                     client.send("LST");
@@ -141,14 +141,15 @@ public class GoConsole implements Runnable {
     }
 
     public static void main(String[] args) {
-       new GoConsole(args).listen();
+        new GoConsole(args).listen();
         
-       /* 
+        /*
         // Debug GUI !
         GoStateAbstract state = new GoStateCube(3, 0);
         state = state.copy(1, state.turn, GoStateAbstract.DELETE_STATUS);
-        new GoViewer(state, null);*/
-        
+        state.stones[0][0]=1;
+        new GoViewer(state, null);
+        */
 
         /*
         // Debug State !

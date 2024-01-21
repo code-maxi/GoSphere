@@ -10,21 +10,18 @@ import data.GoStateCube;
 
 public class GoGame {
     public static final int STATUS_DELAY = 1000;
+    public static final int TIP_DELAY = 6000;
 
     public GoStateAbstract state;
     public final boolean DEBUG;
     private final GoConfig conf;
     
     private final GoUser[] players = new GoUser[2];
-    
     private final int[] captives = new int[2];
     private final int[] fieldPoints = new int[]{ 0, 0 };
     private final double[] pointsSum = new double[]{ 0, 0 };
-
     private final boolean[] players_next = new boolean[2];
-    
     private final ArrayList<int[][]> history = new ArrayList<int[][]>();
-
     private final GoServer server;
 
     public GoGame(GoServer server, GoConfig conf, int id, boolean debug) {
@@ -67,10 +64,10 @@ public class GoGame {
         if (state.status == GoStateAbstract.END_STATUS) nextText = "REMATCH";
         
         boolean end = state.status == GoStateAbstract.END_STATUS;
-        String captivesStr = ""+captives[player];
-        String komiStr     = player == 1 ? (" + " + conf.komi) : "";
-        String fieldStr    = end ? (" + " + fieldPoints[player]) : "";
-        String sumStr      = end ? (" = " + pointsSum[player]) : "";
+        String captivesStr = ""+captives[player]+" captives";
+        String komiStr     = player == 1 ? (" + " + conf.komi   + " komi") : "";
+        String fieldStr    = end ? (" + " + fieldPoints[player] + " field") : "";
+        String sumStr      = end ? (" = " + pointsSum[player]   + " points") : "";
         double pointsDifference = pointsSum[player] - pointsSum[(player+1)%2];
 
         String[] components = {
@@ -144,8 +141,11 @@ public class GoGame {
             players_next[1] = false;
 
             if (state.status == GoStateAbstract.WAIT_STATUS) {
+                if (players[0] != null && players[1] != null) {
+                    GoUser p0 = players[0]; GoUser p1 = players[1];
+                    players[0] = p1; players[1] = p0;
+                }
                 state.clearArray(true, true);
-
                 captives[0] = 0; captives[1] = 0;
                 history.clear();
             }
@@ -212,20 +212,23 @@ public class GoGame {
     public int enemy(int stone) { return stone == 1 ? 2 : (stone == 2 ? 1 : -1); }
 
     public String move(GoMove move) {
-        if (state.stones.length > move.pos.y && state.stones[move.pos.y].length > move.pos.x) {
+        if (move.tip) {
+            state.colors[move.pos.y][move.pos.x] = state.colors[move.pos.y][move.pos.x] == 0 ? GoStateAbstract.GREEN : 0;
+            sendState();
+            if (state.colors[move.pos.y][move.pos.x] != 0) {
+                new Thread(new Runnable() {
+                    public void run() {
+                        try { Thread.sleep(TIP_DELAY); }
+                        catch (InterruptedException ex) {}
+                        state.colors[move.pos.y][move.pos.x] = 0;
+                        sendState();
+                    }
+                }).start();
+            }
+            return null;
+        }
+        else if (state.stones.length > move.pos.y && state.stones[move.pos.y].length > move.pos.x) {
             GoPosAbstract pos = move.pos.changeStone(state.stones[move.pos.y][move.pos.x]);
-            
-            /*if (players_next[enemy(state.turn+1)-1]) {
-                state.clearArray(false, true);
-                GoStoneGroup group = new GoStoneGroup().fill(pos, state.stones, new int[] { 0, enemy(state.turn + 1) });
-                System.out.println("Filling Group at " + pos + " on colors 0 and " + enemy(state.turn + 1));
-                for (GoPosAbstract gpos : group.stones) {
-                    System.out.println(gpos);
-                    state.colors[gpos.y][gpos.x] = (state.turn == 0 ? GoStateAbstract.BLACK : GoStateAbstract.WHITE);
-                }
-                System.out.println("INCLUDES: " + group.containColor(enemy(state.turn+1)));
-                changeTurns();
-            }*/
 
             if (state.status == GoStateAbstract.RUNNING_STATUS) {
                 if (move.me != state.turn) return "MOVEERROR: It is not your turn!";

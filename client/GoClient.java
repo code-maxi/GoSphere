@@ -10,6 +10,7 @@ public class GoClient extends GoSocket {
     public boolean exit = false;
     public String connection = "";
     public int serverVersion = -1;
+    public String serverName = "";
     private GoViewer viewer;
     public GoStateAbstract state;
 
@@ -27,7 +28,10 @@ public class GoClient extends GoSocket {
             if (sub.equals("INF")) System.out.println(GoConsole.ANSI_BLUE + "\nSERVER INFO: " + con + GoConsole.ANSI_RESET);
             if (sub.equals("GUI") && viewer != null) viewer.labels.showError(con); 
             if (sub.equals("CHT") && viewer != null) viewer.canvas.chatMessage(con);
-            if (sub.equals("VRS")) { serverVersion = Integer.parseInt(con); }
+            if (sub.equals("VRS")) {
+                serverVersion = Integer.parseInt(con.split("@")[0]);
+                serverName    = con.split("@")[1];
+            }
         }
         if (message instanceof GoStateAbstract) {
             state = (GoStateAbstract) message;
