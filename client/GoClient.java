@@ -11,6 +11,7 @@ public class GoClient extends GoSocket {
     public boolean exit = false;
     public String connection = "";
     public int serverVersion = -1;
+    public String serverName = "";
     private GoViewer viewer;
     public GoStateAbstract state;
 
@@ -24,6 +25,7 @@ public class GoClient extends GoSocket {
         if (message instanceof String) {
             String sub = ((String) message).substring(0, 3);
             String con = ((String) message).substring(3);
+
             if (sub.equals("ERR"))
                 GoConsole.printError("\nSERVER ERROR: " + con);
             if (sub.equals("INF"))
@@ -33,7 +35,8 @@ public class GoClient extends GoSocket {
             if (sub.equals("CHT") && viewer != null)
                 viewer.canvas.chatMessage(con);
             if (sub.equals("VRS")) {
-                serverVersion = Integer.parseInt(con);
+                serverVersion = Integer.parseInt(con.split("@")[0]);
+                serverName = con.split("@")[1];
             }
         }
         if (message instanceof GoStateAbstract) {

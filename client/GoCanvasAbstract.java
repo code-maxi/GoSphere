@@ -28,6 +28,7 @@ public abstract class GoCanvasAbstract extends JPanel
 
     protected double scale_state = 1;
     protected GoPosAbstract hover_pos;
+    protected GoPosAbstract hover_pos_paint;
 
     protected double[][] wlist = { {}, {} };
 
@@ -154,16 +155,16 @@ public abstract class GoCanvasAbstract extends JPanel
     @Override
     public void mouseMoved(MouseEvent e) {
         hover_pos = null;
-        boolean running = (state.status == GoStateAbstract.RUNNING_STATUS && state.me == state.turn);
-        boolean delete = state.status == GoStateAbstract.DELETE_STATUS;
-        if (running || delete) {
-            for (GoCanvasStoneAbstract point : stones.values()) {
-                boolean running_ok = state.status == GoStateAbstract.RUNNING_STATUS && point.getPos().s == 0;
-                boolean delete_ok = state.status == GoStateAbstract.DELETE_STATUS && point.getPos().s != 0;
-                if ((running_ok || delete_ok) && point.isHovered(e.getX(), e.getY())) {
-                    hover_pos = point.getPos().changeStone(state.me + 1);
-                    break;
-                }
+        hover_pos_paint = null;
+        for (GoCanvasStoneAbstract point : stones.values()) {
+            boolean running_ok = state.status == GoStateAbstract.RUNNING_STATUS && point.getPos().s == 0
+                    && state.turn == state.me;
+            boolean delete_ok = state.status == GoStateAbstract.DELETE_STATUS && point.getPos().s != 0;
+            if (point.isHovered(e.getX(), e.getY())) {
+                hover_pos = point.getPos().changeStone(state.me + 1);
+                if (running_ok || delete_ok)
+                    hover_pos_paint = hover_pos;
+                break;
             }
         }
         repaint();
@@ -194,8 +195,9 @@ public abstract class GoCanvasAbstract extends JPanel
                     drag_pos[1][0] - drag_pos[0][0],
                     drag_pos[1][1] - drag_pos[0][1],
                     0);
-            if (delta.length() <= MAX_MOUSEMOVE) {
-                viewer.doMove(new GoMove(hover_pos, state.me));
+            if (delta.length() <= MAX_MOUSEMOVE
+                    && (e.getButton() == MouseEvent.BUTTON1 || e.getButton() == MouseEvent.BUTTON3)) {
+                viewer.doMove(new GoMove(hover_pos, state.me, e.getButton() == MouseEvent.BUTTON3));
             }
         }
     }

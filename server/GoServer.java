@@ -23,10 +23,12 @@ public class GoServer implements Runnable {
     public ArrayList<Integer> used_ids = new ArrayList<Integer>();
     public boolean exit = false;
     public int port;
+    public String name;
 
-    public GoServer(int port, boolean debug) throws IOException {
+    public GoServer(int port, boolean debug, String name) throws IOException {
         this.port = port;
         this.DEBUG = debug;
+        this.name = name;
         serverSocket = new ServerSocket(port);
         new Thread(this).start();
     }
@@ -98,10 +100,9 @@ public class GoServer implements Runnable {
     public static void main(String[] args) {
         try {
             int port = args.length > 0 ? Integer.parseInt(args[0]) : 5555;
-            boolean debug = args.length > 1 && args[1].equals("DEBUG");
-            new GoServer(port, debug);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            String name = args.length > 1 ? args[1] : "";
+            boolean debug = args.length > 2 && args[2].equals("DEBUG");
+            new GoServer(port, debug, name);
         }
     }
 }

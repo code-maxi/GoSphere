@@ -4,7 +4,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 
 import data.GoPosAbstract;
@@ -16,8 +15,9 @@ import math.GoVector;
 public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
     public static final double PERSPECTIVE_Z_INFLUENCE = 0.3;
 
-    public static final double STONE_POINTS_FAC = 0.7;
-    public static final double MARK_POINTS_FAC = 0.4;
+    public static final double STONE_POINTS_FAC = 0.8;
+    public static final double MARK_POINTS_FAC = 0.5;
+    public static final int CIRCLE_RES = 32;
     
     public static final GoColor BASIC_FACE_COLOR = new GoColor(0.35, 0.35, 0.35, 0.925);
 
@@ -40,6 +40,14 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
         new GoVector(0.5, 0.5, 0),
         new GoVector(-0.5, 0.5, 0)
     };
+
+    public static final GoVector[] GO_CIRCLES = new GoVector[CIRCLE_RES];
+    static {
+        for (int i = 0; i < CIRCLE_RES; i ++) {
+            double a = 2*Math.PI*i/CIRCLE_RES;
+            GO_CIRCLES[i] = new GoVector(0.5*Math.cos(a), 0.5*Math.sin(a),0);
+        }
+    }
 
     public static final GoMatrix[] CUBE_SIDE_ROTATIONS = {
         GoMatrix.unit(),
@@ -64,8 +72,8 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
 
         GoVector[][] cornerPoints = new GoVector[3][4];
         cornerPoints[0] = M.applyAll(CUBE_SIDE_POINTS);
-        cornerPoints[1] = M.connect(GoMatrix.scale(STONE_POINTS_FAC)).applyAll(CUBE_SIDE_POINTS);
-        cornerPoints[2] = M.connect(GoMatrix.scale(MARK_POINTS_FAC)).applyAll(CUBE_SIDE_POINTS);
+        cornerPoints[1] = M.connect(GoMatrix.scale(STONE_POINTS_FAC)).applyAll(GO_CIRCLES);
+        cornerPoints[2] = M.connect(GoMatrix.scale(MARK_POINTS_FAC)).applyAll(GO_CIRCLES);
         return new GoCanvasCubeFace(cornerPoints, pos, color);
     }
 
@@ -79,8 +87,8 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
     public GoPosAbstract pos;
     public GoColor markcolor;
 
-    public GoVector[][] points = new GoVector[4][4];
-    public GoVector[][] rend = new GoVector[4][4];
+    public GoVector[][] points = new GoVector[4][CIRCLE_RES];
+    public GoVector[][] rend = new GoVector[4][CIRCLE_RES];
     public Path2D.Double[] paths = new Path2D.Double[4];
 
     public GoCanvasCubeFace(GoVector[][] cornerPoints, GoPosAbstract pos, int color) {
@@ -105,12 +113,13 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
     public void update(GoMatrix Trm, GoMatrix Rot) {
         for (int y = 0; y < points.length; y ++) {
             Path2D.Double path = new Path2D.Double();
-            for (int x = 0; x < points[0].length; x ++) {
+            for (int x = 0; x < points[y].length; x ++) {
                 if (points[y][x] != null) {
                     rend[y][x] = Rot.apply(points[y][x]);
                     double zoom = 1 + rend[y][x].com[2] * PERSPECTIVE_Z_INFLUENCE;
                     rend[y][x] = Trm.connect(GoMatrix.scale(zoom, zoom, 1)).apply(rend[y][x]);
                     GoVector rp = rend[y][x];
+
                     if (x == 0) path.moveTo(rp.com[0], rp.com[1]);
                     else        path.lineTo(rp.com[0], rp.com[1]);
                 }
@@ -119,7 +128,7 @@ public class GoCanvasCubeFace implements GoCanvasStoneAbstract {
             paths[y] = path;
         }
         GoVector a = rend[0][0].to(rend[0][1]);
-        GoVector b = rend[0][0].to(rend[0][rend[0].length-1]);
+        GoVector b = rend[0][0].to(rend[0][3]);
         GoVector n = b.crossProduct(a).unit();
         angle = PERSPECTIVE_UNIT_VECTOR.angle(n);
         layer = (int)(angle/Math.PI*2);
