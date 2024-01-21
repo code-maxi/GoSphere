@@ -17,7 +17,11 @@ public class GoPromt {
     public Object value;
 
     public GoPromt(String id, String name, int type, String pattern, Object value) {
-        this.id = id; this.name = name; this.type = type; this.pattern = pattern; this.value = value;
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.pattern = pattern;
+        this.value = value;
     }
 
     public String toString() {
@@ -29,21 +33,28 @@ public class GoPromt {
 
         for (GoPromt promt : values) {
             while (promt.value == null) {
-                System.out.print("\n" + promt + "\n" + GoConsole.ANSI_GREEN + (prmtstr != null ? prmtstr : "") + " >>> " + GoConsole.ANSI_RESET);
+                System.out.print("\n" + promt + "\n" + GoConsole.ANSI_GREEN + (prmtstr != null ? prmtstr : "") + " >>> "
+                        + GoConsole.ANSI_RESET);
                 try {
                     Object input = reader.readLine();
-                    if (promt.type == INT) input = Integer.parseInt((String) input);
-                    if (promt.type == DOUB) input = Double.parseDouble((String) input);
-                    if (promt.type == BOOL) input = Boolean.parseBoolean((String) input);
+                    if (promt.type == INT)
+                        input = Integer.parseInt((String) input);
+                    if (promt.type == DOUB)
+                        input = Double.parseDouble((String) input);
+                    if (promt.type == BOOL)
+                        input = Boolean.parseBoolean((String) input);
 
-                    if (input != null && promt.pattern != null && !input.toString().matches(promt.pattern)) {
+                    if (input != null && promt.pattern != null
+                            && !input.toString().toUpperCase().matches(promt.pattern)) {
                         System.out.print("Error, the given input does not match.\n");
                         input = null;
                     }
                     promt.value = input;
+                } catch (NumberFormatException ex) {
+                    System.out.print("Error, could not parse number.\n");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-                catch (NumberFormatException ex) { System.out.print("Error, could not parse number.\n"); }
-                catch (Exception ex) { ex.printStackTrace(); }
             }
         }
     }

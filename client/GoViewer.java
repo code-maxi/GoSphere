@@ -1,4 +1,5 @@
 package client;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -25,42 +26,49 @@ public class GoViewer extends JFrame implements KeyListener, WindowListener {
         this.labels = new GoLabels(state);
         setSize(800, 800);
 
-        add(canvas, BorderLayout.CENTER);
         add(labels, BorderLayout.NORTH);
+        add(canvas, BorderLayout.CENTER);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         addKeyListener(this);
         addWindowListener(this);
         setLocationRelativeTo(null);
-        setTitle("Go3D – Game ["+(GoServer.FORMAT_ID(state.id))+"]");
+        setTitle("Go3D – Game [" + (GoServer.FORMAT_ID(state.id)) + "]");
         setAlwaysOnTop(true);
         setVisible(true);
     }
+
     public void setState(GoStateAbstract state) {
         this.state = state;
         canvas.setState(state);
         labels.setState(state);
     }
+
     public void doMove(GoMove move) {
-        if (client != null) client.send(move);
-        
-        /*GoStateAbstract newState = state.copy((state.me+1)%2, (state.me+1)%2, state.status);
-        newState.clearArray(false, true);
-        newState.stones[move.pos.y][move.pos.x] = move.me+1;
-        System.out.println("Move: " + move.pos);
-        for (GoPosAbstract n : move.pos.neighbours(state.stones)) {
-            System.out.println(n);
-            newState.colors[n.y][n.x] = GoStateAbstract.RED;
-        }
-        System.out.println(newState);
-        setState(newState);*/
-        
+        if (client != null)
+            client.send(move);
+
+        /*
+         * GoStateAbstract newState = state.copy((state.me+1)%2, (state.me+1)%2,
+         * state.status);
+         * newState.clearArray(false, true);
+         * newState.stones[move.pos.y][move.pos.x] = move.me+1;
+         * System.out.println("Move: " + move.pos);
+         * for (GoPosAbstract n : move.pos.neighbours(state.stones)) {
+         * System.out.println(n);
+         * newState.colors[n.y][n.x] = GoStateAbstract.RED;
+         * }
+         * System.out.println(newState);
+         * setState(newState);
+         */
+
     }
 
     public void chatMessage(String text) {
-        if (client != null) client.send("CHT"+text);
+        if (client != null)
+            client.send("CHT" + text);
     }
-    
+
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
@@ -69,7 +77,8 @@ public class GoViewer extends JFrame implements KeyListener, WindowListener {
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent e) {
+    }
 
     @Override
     public void keyReleased(KeyEvent e) {
@@ -80,24 +89,31 @@ public class GoViewer extends JFrame implements KeyListener, WindowListener {
 
     @Override
     public void windowClosing​(WindowEvent e) {
-        if (client != null) client.close();
+        if (client != null)
+            client.close();
     }
 
     @Override
-    public void windowActivated​(WindowEvent e) {}
+    public void windowActivated​(WindowEvent e) {
+    }
 
     @Override
-    public void windowDeactivated​(WindowEvent e) {}
+    public void windowDeactivated​(WindowEvent e) {
+    }
 
     @Override
-    public void windowClosed​(WindowEvent e) {}
+    public void windowClosed​(WindowEvent e) {
+    }
 
     @Override
-    public void windowDeiconified​(WindowEvent e) {}
+    public void windowDeiconified​(WindowEvent e) {
+    }
 
     @Override
-    public void windowIconified​(WindowEvent e) {}
+    public void windowIconified​(WindowEvent e) {
+    }
 
     @Override
-    public void windowOpened​(WindowEvent e) {}
+    public void windowOpened​(WindowEvent e) {
+    }
 }
